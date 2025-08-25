@@ -204,7 +204,7 @@ function renderLessons(){
   list.innerHTML=currentLessons.map((l,i)=>{
     let cls="lesson-item";
     let icon="○";
-    if(l.status==="completed"){icon="Telah ditonton《》";cls+=" lesson-completed";}
+    if(l.status==="completed"){icon="✓";cls+=" lesson-completed";}
     if(l.status==="in_progress"){icon="●";cls+=" lesson-inprogress";}
     if(i===currentLessonIndex){cls+=" lesson-active";}
     return `<div class="${cls}" onclick="playLesson(${i})">
