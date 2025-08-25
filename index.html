@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kelas Video</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary:#2563eb; --secondary:#1e40af;
+      --bg:#f3f4f6; --card:#fff;
+      --text:#111; --muted:#6b7280;
+      --success:#10b981; --warning:#f59e0b;
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+    header{
+      background:linear-gradient(135deg,var(--primary),var(--secondary));
+      color:#fff;padding:1.5rem;text-align:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    }
+    header h1{margin:0;font-size:1.8rem;font-weight:600;}
+    .container{max-width:1200px;margin:2rem auto;padding:1rem;}
+
+    /* Card general */
+    .box{
+      background:var(--card);padding:2rem;border-radius:16px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+      margin-bottom:2rem;transition:transform .2s;
+    }
+    .box:hover{transform:translateY(-2px);}
+
+    input{width:100%;padding:0.9rem;margin:0.5rem 0;border:1px solid #ddd;border-radius:10px;}
+    input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.2);}
+    button{
+      padding:0.9rem 1.2rem;background:var(--primary);
+      color:#fff;border:none;border-radius:10px;
+      cursor:pointer;font-weight:500;transition:background .3s;
+    }
+    button:hover{background:var(--secondary);}
+
+    /* Course cards */
+    .courses-grid{
+      display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;
+    }
+    .course-card{
+      background:#fff;padding:1.5rem;border-radius:14px;
+      box-shadow:0 4px 12px rgba(0,0,0,.06);transition:transform .25s;
+    }
+    .course-card:hover{transform:translateY(-4px);}
+    .course-card h3{margin:.5rem 0;color:var(--primary);}
+    .course-card p{color:var(--muted);font-size:.95rem;line-height:1.4;}
+    .course-card button{margin-top:1rem;width:100%;}
+
+    /* Lessons layout */
+    .lesson-wrapper{
+      display:flex;flex-direction:row;gap:1.5rem;
+    }
+    .lesson-sidebar{
+      flex:1 1 280px;background:#fff;border-radius:14px;padding:1rem;
+      box-shadow:0 4px 12px rgba(0,0,0,.05);height:fit-content;max-height:80vh;overflow-y:auto;
+    }
+    .lesson-list h3{margin:0 0 1rem;}
+    .lesson-item{
+      padding:.6rem .8rem;border-radius:8px;display:flex;align-items:center;
+      margin-bottom:.4rem;cursor:pointer;transition:background .2s;
+      font-size:.95rem;
+    }
+    .lesson-item span{margin-right:.5rem;}
+    .lesson-item:hover{background:#f3f4f6;}
+    .lesson-active{background:#e0e7ff;}
+    .lesson-completed{color:var(--success);}
+    .lesson-inprogress{color:var(--warning);}
+
+    .lesson-content{flex:3 1 700px;}
+    video{width:100%;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1);}
+    #course-title{margin-bottom:1rem;font-size:1.4rem;}
+    
+    /* Responsive */
+    @media(max-width:768px){
+      .lesson-wrapper{flex-direction:column;}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Platform Kursus Video</h1>
+</header>
+
+<div class="container">
+  <!-- Login -->
+  <div id="login" class="box" style="display:none;">
+    <h2>Login</h2>
+    <input type="email" id="email" placeholder="Email" required />
+    <input type="password" id="password" placeholder="Password" required />
+    <button onclick="login()">Login</button>
+  </div>
+
+  <!-- Courses -->
+  <div id="courses" class="box" style="display:none;">
+    <h2>Kursus Saya</h2>
+    <div id="courses-grid" class="courses-grid"></div>
+  </div>
+
+  <!-- Lessons -->
+  <div id="lessons" style="display:none;">
+    <div id="course-title"></div>
+    <div class="lesson-wrapper">
+      <div class="lesson-sidebar">
+        <div id="lesson-list" class="lesson-list"></div>
+      </div>
+      <div class="lesson-content">
+        <video id="lesson-video" controls></video>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const supabaseUrl = "https://vzqrhpcmohxwcschepbt.supabase.co"; // ganti
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6cXJocGNtb2h4d2NzY2hlcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxMDI5OTUsImV4cCI6MjA3MTY3ODk5NX0.E3eM0o6Yo79xHrrtXs7FKyeBuTPzaH-BVC_KOhR2TF4"; // ganti
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+let currentUser=null;
+let currentLessons=[];
+let currentLessonIndex=0;
+
+async function checkSession(){
+  const {data:{session}}=await supabase.auth.getSession();
+  if(session?.user){currentUser=session.user;loadCourses();}
+  else{document.getElementById("login").style.display="block";}
+}
+
+async function login(){
+  const email=document.getElementById("email").value;
+  const password=document.getElementById("password").value;
+  const {data,error}=await supabase.auth.signInWithPassword({email,password});
+  if(error){alert("Login gagal: "+error.message);return;}
+  currentUser=data.user;loadCourses();
+}
+
+async function loadCourses(){
+  document.getElementById("login").style.display="none";
+  const box=document.getElementById("courses");
+  box.style.display="block";
+  const grid=document.getElementById("courses-grid");
+  grid.innerHTML="Loading...";
+
+  const {data,error}=await supabase
+    .from("user_courses")
+    .select("courses(id,title,description,instructor)")
+    .eq("user_id",currentUser.id);
+
+  if(error){grid.innerHTML="Error";return;}
+  if(!data||data.length===0){grid.innerHTML="Belum ada kursus";return;}
+
+  grid.innerHTML=data.map(c=>{
+    const course=c.courses;
+    return `<div class="course-card">
+      <h3>${course.title}</h3>
+      <p>${course.description}</p>
+      <p><strong>Instruktur:</strong> ${course.instructor}</p>
+      <button onclick="loadLessons('${course.id}','${course.title}')">Masuk Kursus</button>
+    </div>`;
+  }).join("");
+}
+
+async function loadLessons(courseId,title){
+  document.getElementById("courses").style.display="none";
+  document.getElementById("lessons").style.display="block";
+  document.getElementById("course-title").innerText=title;
+
+  const list=document.getElementById("lesson-list");
+  list.innerHTML="Loading...";
+
+  const {data,error}=await supabase
+    .from("user_lessons")
+    .select("id,status,lesson_id,lessons(title,video_url,order_no,course_id)")
+    .eq("user_id",currentUser.id);
+
+  if(error){list.innerHTML="Error load";return;}
+
+  currentLessons=data
+    .filter(d=>d.lessons && d.lessons.course_id===courseId)
+    .sort((a,b)=>a.lessons.order_no-b.lessons.order_no);
+
+  if(currentLessons.length===0){list.innerHTML="Tidak ada lesson";return;}
+
+  currentLessonIndex=0;
+  renderLessons();
+  playLesson(0);
+
+  document.getElementById("lesson-video").onended=function(){
+    markCompleted(currentLessons[currentLessonIndex].id);
+    if(currentLessonIndex<currentLessons.length-1){
+      playLesson(currentLessonIndex+1);
+    }
+  };
+}
+
+function renderLessons(){
+  const list=document.getElementById("lesson-list");
+  list.innerHTML=currentLessons.map((l,i)=>{
+    let cls="lesson-item";
+    let icon="⭕";
+    if(l.status==="completed"){icon="✔";cls+=" lesson-completed";}
+    if(l.status==="in_progress"){icon="▶";cls+=" lesson-inprogress";}
+    if(i===currentLessonIndex){cls+=" lesson-active";}
+    return `<div class="${cls}" onclick="playLesson(${i})">
+      <span>${icon}</span> ${l.lessons.order_no}. ${l.lessons.title}
+    </div>`;
+  }).join("");
+}
+
+function playLesson(i){
+  currentLessonIndex=i;
+  document.getElementById("lesson-video").src=currentLessons[i].lessons.video_url;
+  renderLessons();
+  markInProgress(currentLessons[i].id);
+}
+
+async function markInProgress(userLessonId){
+  await supabase.from("user_lessons")
+    .update({status:"in_progress",last_watched_at:new Date()})
+    .eq("id",userLessonId)
+    .eq("user_id",currentUser.id);
+}
+
+async function markCompleted(userLessonId){
+  await supabase.from("user_lessons")
+    .update({status:"completed",last_watched_at:new Date()})
+    .eq("id",userLessonId)
+    .eq("user_id",currentUser.id);
+}
+
+checkSession();
+</script>
+</body>
+</html>
