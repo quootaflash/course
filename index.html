@@ -160,8 +160,8 @@ async function loadCourses(){
     return `<div class="course-card">
       <h3>${course.title}</h3>
       <p>${course.description}</p>
-      <p><strong>Instruktur:</strong> ${course.instructor}</p>
-      <button onclick="loadLessons('${course.id}','${course.title}')">Masuk Kursus</button>
+      <p><strong>Nama Instruktur :</strong> ${course.instructor}</p>
+      <button onclick="loadLessons('${course.id}','${course.title}')">Mulai Belajar</button>
     </div>`;
   }).join("");
 }
