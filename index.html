@@ -84,7 +84,7 @@
 </head>
 <body>
 <header>
-  <h1>Orilix.net | Akses Kelas</h1>
+  <h1>Orilix.net - Akses Kelas</h1>
 </header>
 
 <div class="container">
@@ -93,7 +93,7 @@
     <h2>Masuk ke kelas</h2>
     <p>Silahkan isi sesuai dengan akun anda</p>
     <input type="email" id="email" placeholder="Email akun anda" required />
-    <input type="password" id="password" placeholder="Password akun ada" required />
+    <input type="password" id="password" placeholder="Password akun anda" required />
     <button onclick="login()">Masuk Sekarang</button>
   </div>
 
@@ -203,8 +203,8 @@ function renderLessons(){
   const list=document.getElementById("lesson-list");
   list.innerHTML=currentLessons.map((l,i)=>{
     let cls="lesson-item";
-    let icon="⭕";
-    if(l.status==="completed"){icon="✔";cls+=" lesson-completed";}
+    let icon="□";
+    if(l.status==="completed"){icon="■";cls+=" lesson-completed";}
     if(l.status==="in_progress"){icon="▶";cls+=" lesson-inprogress";}
     if(i===currentLessonIndex){cls+=" lesson-active";}
     return `<div class="${cls}" onclick="playLesson(${i})">
