@@ -145,7 +145,7 @@ async function loadCourses(){
   const box=document.getElementById("courses");
   box.style.display="block";
   const grid=document.getElementById("courses-grid");
-  grid.innerHTML="Loading...";
+  grid.innerHTML="Memuat daftar kursus anda......";
 
   const {data,error}=await supabase
     .from("user_courses")
