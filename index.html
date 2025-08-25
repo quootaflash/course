@@ -154,7 +154,7 @@ async function loadCourses(){
     .eq("user_id",currentUser.id);
 
   if(error){grid.innerHTML="Error";return;}
-  if(!data||data.length===0){grid.innerHTML="Belum ada kursus";return;}
+  if(!data||data.length===0){grid.innerHTML="Belum ada kursus yang aktif......";return;}
 
   grid.innerHTML=data.map(c=>{
     const course=c.courses;
