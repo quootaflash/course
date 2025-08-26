@@ -17,6 +17,8 @@
       --muted: #6b7280;
       --success: #10b981;
       --warning: #f59e0b;
+      --chat-bg: #f9fafb;
+      --chat-border: #e5e7eb;
     }
     body {
       margin: 0;
@@ -116,18 +118,20 @@
       border-radius: 16px;
       padding: 2rem;
       box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      position: relative;
     }
     .video-container {
       position: relative;
       overflow: hidden;
       border-radius: 12px;
       box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      aspect-ratio: 16 / 9;
+      width: 100%;
+      height: auto;
     }
     video {
       width: 100%;
-      height: 100%;
-      object-fit: contain;
+      height: auto;
+      display: block;
     }
     video::-webkit-media-controls-download-button,
     video::-webkit-media-controls-panel [title="Download"] {
@@ -161,6 +165,110 @@
       opacity: 0.5;
       cursor: not-allowed;
       transform: none;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(0,0,0,0.5);
+      border: none;
+      border-radius: 50%;
+      padding: 0.6rem;
+      cursor: pointer;
+      color: #fff;
+      transition: background 0.3s ease;
+      z-index: 10;
+    }
+    .fullscreen-btn:hover {
+      background: rgba(0,0,0,0.7);
+    }
+    .chat-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 360px;
+      height: 500px;
+      background: var(--chat-bg);
+      border: 1px solid var(--chat-border);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      z-index: 100;
+    }
+    .chat-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 1rem;
+      font-weight: 600;
+      text-align: center;
+    }
+    .chat-messages {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .chat-message {
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      max-width: 80%;
+    }
+    .chat-message.user {
+      background: var(--primary);
+      color: #fff;
+      margin-left: auto;
+    }
+    .chat-message.bot {
+      background: #e5e7eb;
+      color: var(--text);
+    }
+    .chat-input {
+      display: flex;
+      padding: 1rem;
+      border-top: 1px solid var(--chat-border);
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 0.8rem;
+      border: 1px solid var(--chat-border);
+      border-radius: 8px 0 0 8px;
+      outline: none;
+    }
+    .chat-input button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .chat-input button:hover {
+      background: var(--secondary);
+    }
+    .chat-toggle {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      cursor: pointer;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.3s;
+    }
+    .chat-toggle:hover {
+      transform: scale(1.1);
     }
     /* Login Page Styles */
     .login-box {
@@ -239,6 +347,16 @@
       .video-container {
         aspect-ratio: 16 / 9;
       }
+      .chat-container {
+        width: 90%;
+        height: 80vh;
+        bottom: 0;
+        right: 0;
+      }
+      .chat-toggle {
+        bottom: 1.5rem;
+        right: 1.5rem;
+      }
     }
     @media (max-width: 480px) {
       .lesson-content {
@@ -298,6 +416,9 @@
         <h3 id="lesson-title" class="text-xl font-semibold mb-6 tracking-tight"></h3>
         <div class="video-container">
           <video id="lesson-video" controls controlsList="nodownload" autoplay></video>
+          <button class="fullscreen-btn" onclick="toggleFullScreen()">
+            <i class="fas fa-expand"></i>
+          </button>
         </div>
         <div class="lesson-actions">
           <div class="lesson-nav">
@@ -315,6 +436,19 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Live Chat -->
+<button class="chat-toggle" onclick="toggleChat()">
+  <i class="fas fa-comment-dots"></i>
+</button>
+<div class="chat-container" id="chat-container">
+  <div class="chat-header">Live Chat Bantuan</div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input">
+    <input type="text" id="chat-input" placeholder="Ketik pesan Anda..." />
+    <button onclick="sendMessage()">Kirim</button>
   </div>
 </div>
 
@@ -481,6 +615,46 @@ async function markCompleted(userLessonId) {
     .update({ status: "completed", last_watched_at: new Date() })
     .eq("id", userLessonId)
     .eq("user_id", currentUser.id);
+}
+
+// Full Screen Toggle
+function toggleFullScreen() {
+  const videoContainer = document.querySelector('.video-container');
+  if (!document.fullscreenElement) {
+    videoContainer.requestFullscreen().catch(err => {
+      console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+}
+
+// Live Chat Functionality
+function toggleChat() {
+  const chatContainer = document.getElementById("chat-container");
+  chatContainer.style.display = chatContainer.style.display === "flex" ? "none" : "flex";
+}
+
+function sendMessage() {
+  const input = document.getElementById("chat-input");
+  const message = input.value.trim();
+  if (!message) return;
+  const messages = document.getElementById("chat-messages");
+  const userMsg = document.createElement("div");
+  userMsg.classList.add("chat-message", "user");
+  userMsg.textContent = message;
+  messages.appendChild(userMsg);
+  messages.scrollTop = messages.scrollHeight;
+  input.value = "";
+
+  // Simulate bot response (replace with actual AI or support logic)
+  setTimeout(() => {
+    const botMsg = document.createElement("div");
+    botMsg.classList.add("chat-message", "bot");
+    botMsg.textContent = "Terima kasih atas pertanyaannya. Tim support akan segera membantu!";
+    messages.appendChild(botMsg);
+    messages.scrollTop = messages.scrollHeight;
+  }, 1000);
 }
 
 // Anti-inspect, anti-injection, and protection
