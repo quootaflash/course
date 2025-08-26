@@ -5,234 +5,420 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Orilix.net | Kelas Saya</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --primary:#2563eb; --secondary:#1e40af;
-      --bg:#f3f4f6; --card:#fff;
-      --text:#111; --muted:#6b7280;
-      --success:#10b981; --warning:#f59e0b;
+      --primary: #2563eb;
+      --secondary: #1e40af;
+      --bg: #f3f4f6;
+      --card: #fff;
+      --text: #111;
+      --muted: #6b7280;
+      --success: #10b981;
+      --warning: #f59e0b;
     }
-    *{box-sizing:border-box;}
-    body{margin:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
-    header{
-      background:linear-gradient(135deg,var(--primary),var(--secondary));
-      color:#fff;padding:1.5rem;text-align:center;
-      box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
     }
-    header h1{margin:0;font-size:1.8rem;font-weight:600;}
-    .container{max-width:1200px;margin:2rem auto;padding:1rem;}
-
-    /* Card general */
-    .box{
-      background:var(--card);padding:2rem;border-radius:16px;
-      box-shadow:0 6px 18px rgba(0,0,0,0.08);
-      margin-bottom:2rem;transition:transform .2s;
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #fff;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-    .box:hover{transform:translateY(-2px);}
-
-    input{width:100%;padding:0.9rem;margin:0.5rem 0;border:1px solid #ddd;border-radius:10px;}
-    input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.2);}
-    button{
-      padding:0.9rem 1.2rem;background:var(--primary);
-      color:#fff;border:none;border-radius:10px;
-      cursor:pointer;font-weight:500;transition:background .3s;
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 1rem;
     }
-    button:hover{background:var(--secondary);}
-
-    /* Course cards */
-    .courses-grid{
-      display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;
+    .box {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      margin-bottom: 2rem;
+      transition: transform .2s;
     }
-    .course-card{
-      background:#fff;padding:1.5rem;border-radius:14px;
-      box-shadow:0 4px 12px rgba(0,0,0,.06);transition:transform .25s;
+    .box:hover {
+      transform: translateY(-2px);
     }
-    .course-card:hover{transform:translateY(-4px);}
-    .course-card h3{margin:.5rem 0;color:var(--primary);}
-    .course-card p{color:var(--muted);font-size:.95rem;line-height:1.4;}
-    .course-card button{margin-top:1rem;width:100%;}
-
-    /* Lessons layout */
-    .lesson-wrapper{
-      display:flex;flex-direction:row;gap:1.5rem;
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
     }
-    .lesson-sidebar{
-      flex:1 1 280px;background:#fff;border-radius:14px;padding:1rem;
-      box-shadow:0 4px 12px rgba(0,0,0,.05);height:fit-content;max-height:80vh;overflow-y:auto;
+    .course-card {
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.06);
+      transition: transform .25s;
     }
-    .lesson-list h3{margin:0 0 1rem;}
-    .lesson-item{
-      padding:.6rem .8rem;border-radius:8px;display:flex;align-items:center;
-      margin-bottom:.4rem;cursor:pointer;transition:background .2s;
-      font-size:.95rem;
+    .course-card:hover {
+      transform: translateY(-4px);
     }
-    .lesson-item span{margin-right:.5rem;}
-    .lesson-item:hover{background:#f3f4f6;}
-    .lesson-active{background:#e0e7ff;}
-    .lesson-completed{color:var(--success);}
-    .lesson-inprogress{color:var(--warning);}
-
-    .lesson-content{flex:3 1 700px;}
-    video{width:100%;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1);}
-    #course-title{margin-bottom:1rem;font-size:1.4rem;}
-    
-    /* Responsive */
-    @media(max-width:768px){
-      .lesson-wrapper{flex-direction:column;}
+    .lesson-wrapper {
+      display: flex;
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+    .lesson-sidebar {
+      flex: 1 1 280px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 1rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,.05);
+      height: fit-content;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .lesson-item {
+      padding: .6rem .8rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      margin-bottom: .4rem;
+      cursor: pointer;
+      transition: background .2s;
+      font-size: .95rem;
+    }
+    .lesson-item:hover {
+      background: #f3f4f6;
+    }
+    .lesson-active {
+      background: #e0e7ff;
+      font-weight: 500;
+    }
+    .lesson-completed {
+      color: var(--success);
+    }
+    .lesson-inprogress {
+      color: var(--warning);
+    }
+    .lesson-content {
+      flex: 3 1 700px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,.05);
+    }
+    .video-container {
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    }
+    video {
+      width: 100%;
+      height: auto;
+    }
+    .lesson-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1rem;
+      gap: 1rem;
+    }
+    .lesson-nav {
+      display: flex;
+      gap: 0.5rem;
+    }
+    /* Login Page Styles */
+    .login-box {
+      max-width: 400px;
+      margin: 3rem auto;
+      padding: 2rem;
+      background: var(--card);
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      transition: transform 0.3s ease;
+    }
+    .login-box:hover {
+      transform: translateY(-4px);
+    }
+    .login-box h2 {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    .login-box p {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    .input-group i {
+      position: absolute;
+      top: 50%;
+      left: 1rem;
+      transform: translateY(-50%);
+      color: var(--muted);
+    }
+    .login-box input {
+      width: 100%;
+      padding: 0.9rem 0.9rem 0.9rem 2.5rem;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .login-box input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+      outline: none;
+    }
+    .error-message {
+      color: #ef4444;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 0.5rem;
+      display: none;
+    }
+    @media (max-width: 768px) {
+      .lesson-wrapper {
+        flex-direction: column;
+      }
+      .lesson-sidebar {
+        height: auto;
+        max-height: none;
+      }
+      .login-box {
+        margin: 2rem 1rem;
+        padding: 1.5rem;
+      }
     }
   </style>
 </head>
 <body>
 <header>
-  <h1>Orilix.net - Akses Kelas</h1>
+  <h1 class="text-2xl font-bold">Orilix.net - Akses Kelas</h1>
 </header>
 
 <div class="container">
   <!-- Login -->
-  <div id="login" class="box" style="display:none;">
-    <h2>Masuk ke kelas</h2>
-    <p>Silahkan isi sesuai dengan akun anda</p>
-    <input type="email" id="email" placeholder="Email akun anda" required />
-    <input type="password" id="password" placeholder="Password akun anda" required />
-    <button onclick="login()">Masuk Sekarang</button>
+  <div id="login" class="login-box" style="display: none;">
+    <h2>Masuk ke Kelas</h2>
+    <p>Silakan masukkan akun Anda untuk melanjutkan</p>
+    <div class="input-group">
+      <i class="fas fa-envelope"></i>
+      <input type="email" id="email" placeholder="Email" required />
+    </div>
+    <div class="input-group">
+      <i class="fas fa-lock"></i>
+      <input type="password" id="password" placeholder="Kata Sandi" required />
+    </div>
+    <p id="error-message" class="error-message">Login gagal, periksa email atau kata sandi</p>
+    <button onclick="login()" class="w-full bg-blue-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-700 transition">Masuk Sekarang</button>
   </div>
 
   <!-- Courses -->
-  <div id="courses" class="box" style="display:none;">
-    <h2>Daftar Kursus saya</h2>
-    <h4>Berikut daftar kursus yang sudah anda beli</h4>
+  <div id="courses" class="box" style="display: none;">
+    <h2 class="text-xl font-semibold mb-4">Daftar Kursus Saya</h2>
+    <p class="text-gray-600 mb-6">Berikut daftar kursus yang sudah Anda beli</p>
     <div id="courses-grid" class="courses-grid"></div>
   </div>
 
   <!-- Lessons -->
-  <div id="lessons" style="display:none;">
-    <div id="course-title"></div>
+  <div id="lessons" style="display: none;">
+    <h2 id="course-title" class="text-xl font-semibold mb-6"></h2>
     <div class="lesson-wrapper">
       <div class="lesson-sidebar">
+        <h3 class="text-lg font-medium mb-4">Daftar Pelajaran</h3>
         <div id="lesson-list" class="lesson-list"></div>
       </div>
       <div class="lesson-content">
-        <video id="lesson-video" controls></video>
+        <h3 id="lesson-title" class="text-lg font-medium mb-4"></h3>
+        <div class="video-container">
+          <video id="lesson-video" controls autoplay></video>
+        </div>
+        <div class="lesson-actions">
+          <div class="lesson-nav">
+            <button id="prev-lesson" class="bg-gray-200 text-gray-700 font-medium rounded-lg px-4 py-2 hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed">Pelajaran Sebelumnya</button>
+            <button id="next-lesson" class="bg-blue-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Pelajaran Selanjutnya</button>
+          </div>
+          <a id="download-video" class="bg-green-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-green-700 transition" download>Download Video</a>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-const supabaseUrl = "https://vzqrhpcmohxwcschepbt.supabase.co"; // ganti
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6cXJocGNtb2h4d2NzY2hlcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxMDI5OTUsImV4cCI6MjA3MTY3ODk5NX0.E3eM0o6Yo79xHrrtXs7FKyeBuTPzaH-BVC_KOhR2TF4"; // ganti
+const supabaseUrl = "https://vzqrhpcmohxwcschepbt.supabase.co"; // Ganti dengan URL Supabase Anda
+const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6cXJocGNtb2h4d2NzY2hlcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxMDI5OTUsImV4cCI6MjA3MTY3ODk5NX0.E3eM0o6Yo79xHrrtXs7FKyeBuTPzaH-BVC_KOhR2TF4"; // Ganti dengan kunci Supabase Anda
 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-let currentUser=null;
-let currentLessons=[];
-let currentLessonIndex=0;
+let currentUser = null;
+let currentLessons = [];
+let currentLessonIndex = 0;
 
-async function checkSession(){
-  const {data:{session}}=await supabase.auth.getSession();
-  if(session?.user){currentUser=session.user;loadCourses();}
-  else{document.getElementById("login").style.display="block";}
+async function checkSession() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    loadCourses();
+  } else {
+    document.getElementById("login").style.display = "block";
+  }
 }
 
-async function login(){
-  const email=document.getElementById("email").value;
-  const password=document.getElementById("password").value;
-  const {data,error}=await supabase.auth.signInWithPassword({email,password});
-  if(error){alert("Login gagal: "+error.message);return;}
-  currentUser=data.user;loadCourses();
+async function login() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  const errorMessage = document.getElementById("error-message");
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    errorMessage.style.display = "block";
+    return;
+  }
+  errorMessage.style.display = "none";
+  currentUser = data.user;
+  loadCourses();
 }
 
-async function loadCourses(){
-  document.getElementById("login").style.display="none";
-  const box=document.getElementById("courses");
-  box.style.display="block";
-  const grid=document.getElementById("courses-grid");
-  grid.innerHTML="Memuat daftar kursus anda......";
+async function loadCourses() {
+  document.getElementById("login").style.display = "none";
+  const box = document.getElementById("courses");
+  box.style.display = "block";
+  const grid = document.getElementById("courses-grid");
+  grid.innerHTML = "<p class='text-center text-gray-500'>Memuat daftar kursus anda...</p>";
 
-  const {data,error}=await supabase
+  const { data, error } = await supabase
     .from("user_courses")
-    .select("courses(id,title,description,instructor)")
-    .eq("user_id",currentUser.id);
+    .select("courses(id, title, description, instructor)")
+    .eq("user_id", currentUser.id);
 
-  if(error){grid.innerHTML="Error";return;}
-  if(!data||data.length===0){grid.innerHTML="Belum ada kursus yang aktif......";return;}
+  if (error) {
+    grid.innerHTML = "<p class='text-center text-red-500'>Error memuat kursus</p>";
+    return;
+  }
+  if (!data || data.length === 0) {
+    grid.innerHTML = "<p class='text-center text-gray-500'>Belum ada kursus yang aktif</p>";
+    return;
+  }
 
-  grid.innerHTML=data.map(c=>{
-    const course=c.courses;
-    return `<div class="course-card">
-      <h3>${course.title}</h3>
-      <p>${course.description}</p>
-      <p><strong>Nama Instruktur :</strong> ${course.instructor}</p>
-      <button onclick="loadLessons('${course.id}','${course.title}')">Mulai Belajar 》</button>
-    </div>`;
+  grid.innerHTML = data.map(c => {
+    const course = c.courses;
+    return `
+      <div class="course-card">
+        <h3 class="text-lg font-medium text-blue-600 mb-2">${course.title}</h3>
+        <p class="text-sm text-gray-600 mb-4">${course.description}</p>
+        <p class="text-sm text-gray-700"><strong>Instruktur:</strong> ${course.instructor}</p>
+        <button onclick="loadLessons('${course.id}', '${course.title}')" class="mt-4 w-full bg-blue-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-700 transition">Mulai Belajar →</button>
+      </div>
+    `;
   }).join("");
 }
 
-async function loadLessons(courseId,title){
-  document.getElementById("courses").style.display="none";
-  document.getElementById("lessons").style.display="block";
-  document.getElementById("course-title").innerText=title;
+async function loadLessons(courseId, title) {
+  document.getElementById("courses").style.display = "none";
+  document.getElementById("lessons").style.display = "block";
+  document.getElementById("course-title").innerText = title;
 
-  const list=document.getElementById("lesson-list");
-  list.innerHTML="Loading...";
+  const list = document.getElementById("lesson-list");
+  list.innerHTML = "<p class='text-center text-gray-500'>Memuat pelajaran...</p>";
 
-  const {data,error}=await supabase
+  const { data, error } = await supabase
     .from("user_lessons")
-    .select("id,status,lesson_id,lessons(title,video_url,order_no,course_id)")
-    .eq("user_id",currentUser.id);
+    .select("id, status, lesson_id, lessons(title, video_url, order_no, course_id)")
+    .eq("user_id", currentUser.id);
 
-  if(error){list.innerHTML="Error load";return;}
+  if (error) {
+    list.innerHTML = "<p class='text-center text-red-500'>Error memuat pelajaran</p>";
+    return;
+  }
 
-  currentLessons=data
-    .filter(d=>d.lessons && d.lessons.course_id===courseId)
-    .sort((a,b)=>a.lessons.order_no-b.lessons.order_no);
+  currentLessons = data
+    .filter(d => d.lessons && d.lessons.course_id === courseId)
+    .sort((a, b) => a.lessons.order_no - b.lessons.order_no);
 
-  if(currentLessons.length===0){list.innerHTML="Tidak ada lesson";return;}
+  if (currentLessons.length === 0) {
+    list.innerHTML = "<p class='text-center text-gray-500'>Tidak ada pelajaran</p>";
+    return;
+  }
 
-  currentLessonIndex=0;
+  currentLessonIndex = 0;
   renderLessons();
   playLesson(0);
 
-  document.getElementById("lesson-video").onended=function(){
+  const video = document.getElementById("lesson-video");
+  video.onended = function() {
     markCompleted(currentLessons[currentLessonIndex].id);
-    if(currentLessonIndex<currentLessons.length-1){
-      playLesson(currentLessonIndex+1);
+    if (currentLessonIndex < currentLessons.length - 1) {
+      playLesson(currentLessonIndex + 1);
     }
   };
+
+  document.getElementById("prev-lesson").addEventListener("click", () => {
+    if (currentLessonIndex > 0) playLesson(currentLessonIndex - 1);
+  });
+  document.getElementById("next-lesson").addEventListener("click", () => {
+    if (currentLessonIndex < currentLessons.length - 1) playLesson(currentLessonIndex + 1);
+  });
 }
 
-function renderLessons(){
-  const list=document.getElementById("lesson-list");
-  list.innerHTML=currentLessons.map((l,i)=>{
-    let cls="lesson-item";
-    let icon="○";
-    if(l.status==="completed"){icon="✓";cls+=" lesson-completed";}
-    if(l.status==="in_progress"){icon="●";cls+=" lesson-inprogress";}
-    if(i===currentLessonIndex){cls+=" lesson-active";}
-    return `<div class="${cls}" onclick="playLesson(${i})">
-      <span>${icon}</span> ${l.lessons.order_no}. ${l.lessons.title}
-    </div>`;
+function renderLessons() {
+  const list = document.getElementById("lesson-list");
+  list.innerHTML = "";
+  list.innerHTML = currentLessons.map((l, i) => {
+    let cls = "lesson-item";
+    let icon = "<i class='fas fa-circle text-gray-400'></i>";
+    if (l.status === "completed") {
+      icon = "<i class='fas fa-check-circle text-green-500'></i>";
+      cls += " lesson-completed";
+    }
+    if (l.status === "in_progress") {
+      icon = "<i class='fas fa-dot-circle text-yellow-500'></i>";
+      cls += " lesson-inprogress";
+    }
+    if (i === currentLessonIndex) cls += " lesson-active font-medium bg-blue-100";
+    return `
+      <div class="${cls}" onclick="playLesson(${i})">
+        ${icon} <span class="ml-2">${l.lessons.order_no}. ${l.lessons.title}</span>
+      </div>
+    `;
   }).join("");
+
+  document.getElementById("prev-lesson").disabled = currentLessonIndex === 0;
+  document.getElementById("next-lesson").disabled = currentLessonIndex === currentLessons.length - 1;
 }
 
-function playLesson(i){
-  currentLessonIndex=i;
-  document.getElementById("lesson-video").src=currentLessons[i].lessons.video_url;
+function playLesson(i) {
+  currentLessonIndex = i;
+  const lesson = currentLessons[i];
+  document.getElementById("lesson-title").innerText = `${lesson.lessons.order_no}. ${lesson.lessons.title}`;
+  const video = document.getElementById("lesson-video");
+  video.src = lesson.lessons.video_url;
+  video.play();
+  const downloadLink = document.getElementById("download-video");
+  downloadLink.href = lesson.lessons.video_url;
+  downloadLink.download = `${lesson.lessons.title}.mp4`;
   renderLessons();
-  markInProgress(currentLessons[i].id);
+  markInProgress(lesson.id);
 }
 
-async function markInProgress(userLessonId){
+async function markInProgress(userLessonId) {
   await supabase.from("user_lessons")
-    .update({status:"in_progress",last_watched_at:new Date()})
-    .eq("id",userLessonId)
-    .eq("user_id",currentUser.id);
+    .update({ status: "in_progress", last_watched_at: new Date() })
+    .eq("id", userLessonId)
+    .eq("user_id", currentUser.id);
 }
 
-async function markCompleted(userLessonId){
+async function markCompleted(userLessonId) {
   await supabase.from("user_lessons")
-    .update({status:"completed",last_watched_at:new Date()})
-    .eq("id",userLessonId)
-    .eq("user_id",currentUser.id);
+    .update({ status: "completed", last_watched_at: new Date() })
+    .eq("id", userLessonId)
+    .eq("user_id", currentUser.id);
 }
 
 checkSession();
