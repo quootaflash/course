@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Orilix.net | Kelas Saya</title>
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -23,76 +23,86 @@
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
     header {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: #fff;
       padding: 1.5rem;
       text-align: center;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
     .container {
-      max-width: 1200px;
+      max-width: 1280px;
       margin: 2rem auto;
       padding: 1rem;
     }
     .box {
       background: var(--card);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      margin-bottom: 2rem;
-      transition: transform .2s;
+      padding: 2.5rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      margin-bottom: 2.5rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .box:hover {
-      transform: translateY(-2px);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
     }
     .courses-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
     }
     .course-card {
-      background: #fff;
-      padding: 1.5rem;
-      border-radius: 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.06);
-      transition: transform .25s;
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      padding: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .course-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-6px);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.1);
     }
     .lesson-wrapper {
       display: flex;
       flex-direction: row;
-      gap: 1.5rem;
+      gap: 2rem;
     }
     .lesson-sidebar {
-      flex: 1 1 280px;
-      background: #fff;
-      border-radius: 14px;
-      padding: 1rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,.05);
+      flex: 1 1 300px;
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
       height: fit-content;
-      max-height: 80vh;
+      max-height: 85vh;
       overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #cbd5e1 #f1f5f9;
     }
     .lesson-item {
-      padding: .6rem .8rem;
-      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      border-radius: 10px;
       display: flex;
       align-items: center;
-      margin-bottom: .4rem;
+      margin-bottom: 0.6rem;
       cursor: pointer;
-      transition: background .2s;
-      font-size: .95rem;
+      transition: background 0.3s ease, transform 0.3s ease;
+      font-size: 1rem;
     }
     .lesson-item:hover {
-      background: #f3f4f6;
+      background: #f1f5f9;
+      transform: translateX(4px);
     }
     .lesson-active {
-      background: #e0e7ff;
-      font-weight: 500;
+      background: #dbeafe;
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px #3b82f6;
     }
     .lesson-completed {
       color: var(--success);
@@ -101,88 +111,114 @@
       color: var(--warning);
     }
     .lesson-content {
-      flex: 3 1 700px;
-      background: #fff;
-      border-radius: 14px;
-      padding: 1.5rem;
-      box-shadow: 0 4px 12px rgba(0,0,0,.05);
+      flex: 3 1 800px;
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
     }
     .video-container {
       position: relative;
       overflow: hidden;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.1);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      aspect-ratio: 16 / 9;
     }
     video {
       width: 100%;
-      height: auto;
+      height: 100%;
+      object-fit: contain;
     }
     .lesson-actions {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 1rem;
-      gap: 1rem;
+      margin-top: 1.5rem;
+      gap: 1.5rem;
     }
     .lesson-nav {
       display: flex;
-      gap: 0.5rem;
+      gap: 1rem;
+    }
+    .icon-btn {
+      background: #f1f5f9;
+      border: none;
+      border-radius: 50%;
+      padding: 0.8rem;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .icon-btn:hover {
+      background: #e2e8f0;
+      transform: scale(1.1);
+    }
+    .icon-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
     }
     /* Login Page Styles */
     .login-box {
-      max-width: 400px;
-      margin: 3rem auto;
-      padding: 2rem;
-      background: var(--card);
-      border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      transition: transform 0.3s ease;
+      max-width: 420px;
+      margin: 4rem auto;
+      padding: 2.5rem;
+      background: linear-gradient(145deg, #ffffff, #f8fafc);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .login-box:hover {
-      transform: translateY(-4px);
+      transform: translateY(-6px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.14);
     }
     .login-box h2 {
-      font-size: 1.75rem;
-      font-weight: 600;
+      font-size: 1.875rem;
+      font-weight: 700;
       color: var(--text);
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.25rem;
     }
     .login-box p {
       text-align: center;
       color: var(--muted);
-      margin-bottom: 1.5rem;
+      margin-bottom: 2rem;
+      font-size: 1rem;
     }
     .input-group {
       position: relative;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
     }
     .input-group i {
       position: absolute;
       top: 50%;
-      left: 1rem;
+      left: 1.25rem;
       transform: translateY(-50%);
       color: var(--muted);
+      font-size: 1.1rem;
     }
     .login-box input {
       width: 100%;
-      padding: 0.9rem 0.9rem 0.9rem 2.5rem;
-      border: 1px solid #ddd;
-      border-radius: 10px;
+      padding: 1rem 1rem 1rem 3rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
       font-size: 1rem;
-      transition: border-color 0.3s, box-shadow 0.3s;
+      background: #f8fafc;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     }
     .login-box input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+      box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
+      background: #fff;
       outline: none;
     }
     .error-message {
       color: #ef4444;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       text-align: center;
-      margin-top: 0.5rem;
+      margin-top: 0.75rem;
       display: none;
+      font-weight: 500;
     }
     @media (max-width: 768px) {
       .lesson-wrapper {
@@ -193,15 +229,18 @@
         max-height: none;
       }
       .login-box {
-        margin: 2rem 1rem;
-        padding: 1.5rem;
+        margin: 3rem 1.5rem;
+        padding: 2rem;
+      }
+      .video-container {
+        aspect-ratio: 16 / 9;
       }
     }
   </style>
 </head>
 <body>
 <header>
-  <h1 class="text-2xl font-bold">Orilix.net - Akses Kelas</h1>
+  <h1 class="text-3xl font-bold tracking-tight">Orilix.net - Akses Kelas</h1>
 </header>
 
 <div class="container">
@@ -218,35 +257,48 @@
       <input type="password" id="password" placeholder="Kata Sandi" required />
     </div>
     <p id="error-message" class="error-message">Login gagal, periksa email atau kata sandi</p>
-    <button onclick="login()" class="w-full bg-blue-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-700 transition">Masuk Sekarang</button>
+    <button onclick="login()" class="w-full bg-blue-600 text-white font-medium rounded-xl px-4 py-3 hover:bg-blue-700 transition duration-300 ease-in-out">Masuk Sekarang</button>
   </div>
 
   <!-- Courses -->
   <div id="courses" class="box" style="display: none;">
-    <h2 class="text-xl font-semibold mb-4">Daftar Kursus Saya</h2>
-    <p class="text-gray-600 mb-6">Berikut daftar kursus yang sudah Anda beli</p>
+    <h2 class="text-2xl font-bold mb-6 tracking-tight">Daftar Kursus Saya</h2>
+    <p class="text-gray-600 mb-8 text-lg">Berikut daftar kursus yang sudah Anda beli</p>
     <div id="courses-grid" class="courses-grid"></div>
   </div>
 
   <!-- Lessons -->
   <div id="lessons" style="display: none;">
-    <h2 id="course-title" class="text-xl font-semibold mb-6"></h2>
+    <h2 id="course-title" class="text-2xl font-bold mb-8 tracking-tight"></h2>
     <div class="lesson-wrapper">
       <div class="lesson-sidebar">
-        <h3 class="text-lg font-medium mb-4">Daftar Pelajaran</h3>
+        <h3 class="text-xl font-semibold mb-6 tracking-tight">Daftar Pelajaran</h3>
         <div id="lesson-list" class="lesson-list"></div>
       </div>
       <div class="lesson-content">
-        <h3 id="lesson-title" class="text-lg font-medium mb-4"></h3>
+        <h3 id="lesson-title" class="text-xl font-semibold mb-6 tracking-tight"></h3>
         <div class="video-container">
           <video id="lesson-video" controls autoplay></video>
         </div>
         <div class="lesson-actions">
           <div class="lesson-nav">
-            <button id="prev-lesson" class="bg-gray-200 text-gray-700 font-medium rounded-lg px-4 py-2 hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed">Pelajaran Sebelumnya</button>
-            <button id="next-lesson" class="bg-blue-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">Pelajaran Selanjutnya</button>
+            <button id="prev-lesson" class="icon-btn disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M15 18L9 12L15 6" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <button id="next-lesson" class="icon-btn disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 18L15 12L9 6" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
           </div>
-          <a id="download-video" class="bg-green-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-green-700 transition" download>Download Video</a>
+          <a id="download-video" class="icon-btn" download>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 4V16M12 16L8 12M12 16L16 12" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 20H20" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </a>
         </div>
       </div>
     </div>
@@ -273,8 +325,8 @@ async function checkSession() {
 }
 
 async function login() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim().replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
+  const password = document.getElementById("password").value.trim().replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
   const errorMessage = document.getElementById("error-message");
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) {
@@ -311,10 +363,10 @@ async function loadCourses() {
     const course = c.courses;
     return `
       <div class="course-card">
-        <h3 class="text-lg font-medium text-blue-600 mb-2">${course.title}</h3>
-        <p class="text-sm text-gray-600 mb-4">${course.description}</p>
-        <p class="text-sm text-gray-700"><strong>Instruktur:</strong> ${course.instructor}</p>
-        <button onclick="loadLessons('${course.id}', '${course.title}')" class="mt-4 w-full bg-blue-600 text-white font-medium rounded-lg px-4 py-2 hover:bg-blue-700 transition">Mulai Belajar →</button>
+        <h3 class="text-xl font-semibold text-blue-600 mb-3 tracking-tight">${course.title}</h3>
+        <p class="text-base text-gray-600 mb-5 leading-relaxed">${course.description}</p>
+        <p class="text-base text-gray-700 mb-5"><strong>Instruktur:</strong> ${course.instructor}</p>
+        <button onclick="loadLessons('${course.id}', '${course.title}')" class="w-full bg-blue-600 text-white font-medium rounded-xl px-4 py-3 hover:bg-blue-700 transition duration-300 ease-in-out">Mulai Belajar →</button>
       </div>
     `;
   }).join("");
@@ -372,19 +424,19 @@ function renderLessons() {
   list.innerHTML = "";
   list.innerHTML = currentLessons.map((l, i) => {
     let cls = "lesson-item";
-    let icon = "<i class='fas fa-circle text-gray-400'></i>";
+    let icon = "<i class='fas fa-circle text-gray-400 text-sm mr-2'></i>";
     if (l.status === "completed") {
-      icon = "<i class='fas fa-check-circle text-green-500'></i>";
+      icon = "<i class='fas fa-check-circle text-green-500 text-sm mr-2'></i>";
       cls += " lesson-completed";
     }
     if (l.status === "in_progress") {
-      icon = "<i class='fas fa-dot-circle text-yellow-500'></i>";
+      icon = "<i class='fas fa-dot-circle text-yellow-500 text-sm mr-2'></i>";
       cls += " lesson-inprogress";
     }
-    if (i === currentLessonIndex) cls += " lesson-active font-medium bg-blue-100";
+    if (i === currentLessonIndex) cls += " lesson-active";
     return `
       <div class="${cls}" onclick="playLesson(${i})">
-        ${icon} <span class="ml-2">${l.lessons.order_no}. ${l.lessons.title}</span>
+        ${icon} ${l.lessons.order_no}. ${l.lessons.title}
       </div>
     `;
   }).join("");
@@ -420,6 +472,21 @@ async function markCompleted(userLessonId) {
     .eq("id", userLessonId)
     .eq("user_id", currentUser.id);
 }
+
+// Anti-inspect, anti-injection, and protection
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+    (e.ctrlKey && e.key === 'U')
+  ) {
+    e.preventDefault();
+  }
+});
+document.addEventListener('wheel', e => {
+  if (e.ctrlKey) e.preventDefault();
+}, { passive: false });
 
 checkSession();
 </script>
