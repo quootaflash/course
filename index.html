@@ -127,11 +127,15 @@
       box-shadow: 0 6px 18px rgba(0,0,0,0.1);
       width: 100%;
       height: auto;
+      padding: 0;
+      margin: 0;
     }
     video {
       width: 100%;
       height: auto;
       display: block;
+      margin: 0;
+      padding: 0;
     }
     video::-webkit-media-controls-download-button,
     video::-webkit-media-controls-panel [title="Download"] {
@@ -203,6 +207,19 @@
       padding: 1rem;
       font-weight: 600;
       text-align: center;
+      position: relative;
+    }
+    .chat-close {
+      position: absolute;
+      top: 0.5rem;
+      right: 1rem;
+      color: #fff;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+    }
+    .chat-close:hover {
+      color: #dbeafe;
     }
     .chat-messages {
       flex: 1;
@@ -332,6 +349,17 @@
       display: none;
       font-weight: 500;
     }
+    @media (max-width: 1024px) {
+      .lesson-wrapper {
+        gap: 1.5rem;
+      }
+      .lesson-sidebar {
+        flex: 1 1 250px;
+      }
+      .lesson-content {
+        flex: 3 1 600px;
+      }
+    }
     @media (max-width: 768px) {
       .lesson-wrapper {
         flex-direction: column;
@@ -348,10 +376,11 @@
         aspect-ratio: 16 / 9;
       }
       .chat-container {
-        width: 90%;
-        height: 80vh;
+        width: 100%;
+        height: 100vh;
         bottom: 0;
         right: 0;
+        border-radius: 0;
       }
       .chat-toggle {
         bottom: 1.5rem;
@@ -359,6 +388,15 @@
       }
     }
     @media (max-width: 480px) {
+      .container {
+        padding: 0.5rem;
+      }
+      .box {
+        padding: 1.5rem;
+      }
+      .course-card {
+        padding: 1.5rem;
+      }
       .lesson-content {
         padding: 1.5rem;
       }
@@ -371,6 +409,16 @@
       }
       .icon-btn {
         padding: 0.6rem;
+      }
+      .fullscreen-btn {
+        bottom: 0.5rem;
+        right: 0.5rem;
+      }
+      .chat-input input {
+        padding: 0.6rem;
+      }
+      .chat-input button {
+        padding: 0.6rem 1rem;
       }
     }
   </style>
@@ -444,10 +492,12 @@
   <i class="fas fa-comment-dots"></i>
 </button>
 <div class="chat-container" id="chat-container">
-  <div class="chat-header">Live Chat Bantuan</div>
+  <div class="chat-header">Live Chat Bantuan
+    <i class="fas fa-times chat-close" onclick="toggleChat()"></i>
+  </div>
   <div class="chat-messages" id="chat-messages"></div>
   <div class="chat-input">
-    <input type="text" id="chat-input" placeholder="Ketik pesan Anda..." />
+    <input type="text" id="chat-input" placeholder="Ketik pesan Anda..." onkeypress="if(event.keyCode==13) sendMessage()" />
     <button onclick="sendMessage()">Kirim</button>
   </div>
 </div>
@@ -647,11 +697,40 @@ function sendMessage() {
   messages.scrollTop = messages.scrollHeight;
   input.value = "";
 
-  // Simulate bot response (replace with actual AI or support logic)
+  // Simulate bot response with more technical variety
   setTimeout(() => {
+    let botResponse = "Terima kasih atas pertanyaannya. Tim support akan segera membantu!";
+    if (message.toLowerCase().includes("video")) {
+      const videoResponses = [
+        "Jika video tidak memuat, coba refresh halaman atau periksa koneksi internet Anda. Pastikan browser Anda up-to-date.",
+        "Untuk masalah kualitas video, sesuaikan pengaturan resolusi di kontrol video. Kami mendukung hingga 1080p.",
+        "Jika video terputus, ini mungkin karena buffer. Coba jeda sejenak atau kurangi kecepatan pemutaran.",
+        "Pastikan Anda menggunakan browser yang kompatibel seperti Chrome atau Firefox untuk pemutaran video optimal.",
+        "Jika ada error pada video, catat kode error dan kirimkan kepada kami untuk analisis lebih lanjut."
+      ];
+      botResponse = videoResponses[Math.floor(Math.random() * videoResponses.length)];
+    } else if (message.toLowerCase().includes("course") || message.toLowerCase().includes("kursus")) {
+      const courseResponses = [
+        "Untuk mengakses materi course, pastikan Anda telah menyelesaikan pembayaran dan login dengan akun yang benar.",
+        "Jika pelajaran course tidak muncul, coba logout dan login kembali, atau hubungi support untuk verifikasi akses.",
+        "Course kami dirancang dengan kurikulum industri, termasuk proyek nyata dan mentoring dari praktisi berpengalaman.",
+        "Untuk melacak progres course, periksa status pelajaran di sidebar. Hijau berarti selesai, kuning sedang dikerjakan.",
+        "Jika ada kesulitan teknis pada course, seperti error loading, coba clear cache browser Anda terlebih dahulu."
+      ];
+      botResponse = courseResponses[Math.floor(Math.random() * courseResponses.length)];
+    } else if (message.toLowerCase().includes("kendala") || message.toLowerCase().includes("masalah")) {
+      const issueResponses = [
+        "Deskripsikan kendala lebih detail, misalnya error code atau screenshot, agar kami bisa membantu lebih cepat.",
+        "Untuk kendala login, pastikan email dan password benar. Jika lupa password, gunakan fitur reset.",
+        "Jika ada masalah dengan pembayaran course, periksa transaksi bank Anda atau hubungi provider pembayaran.",
+        "Kendala umum pada video: pastikan ad blocker dimatikan, karena bisa mengganggu pemutaran.",
+        "Jika platform lambat, coba akses di waktu lain atau gunakan VPN jika ada pembatasan regional."
+      ];
+      botResponse = issueResponses[Math.floor(Math.random() * issueResponses.length)];
+    }
     const botMsg = document.createElement("div");
     botMsg.classList.add("chat-message", "bot");
-    botMsg.textContent = "Terima kasih atas pertanyaannya. Tim support akan segera membantu!";
+    botMsg.textContent = botResponse;
     messages.appendChild(botMsg);
     messages.scrollTop = messages.scrollHeight;
   }, 1000);
