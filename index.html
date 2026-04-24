@@ -53,7 +53,7 @@
 
         /* Label */
         .fl { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
-        .fl span.req { color: var(--danger); }
+        .fl span.req { color: #ef4444; }
 
         /* Accordion */
         .acc-hd { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; cursor: pointer; border-bottom: 1px solid var(--border); user-select: none; }
@@ -83,7 +83,7 @@
 
         @media (max-width: 768px) {
             .grid-container { display: flex; flex-direction: column; }
-            .preview-col { order: -1; } /* Preview di atas di mobile */
+            .preview-col { order: -1; } 
         }
     </style>
 </head>
@@ -106,7 +106,7 @@
                 <button onclick="toggleDark()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition text-blue-200">
                     <i class="fa-solid fa-moon text-sm"></i>
                 </button>
-                <button onclick="copyEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20">
+                <button onclick="copyEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20">
                     <i class="fa-regular fa-copy"></i> Salin Surat
                 </button>
             </div>
@@ -200,7 +200,7 @@
                                 <input id="expComp" class="fi" value="PT. Teknologi Nusantara" oninput="updatePreview()">
                             </div>
                             <div>
-                                <label class="fl">Pencapaian Utama (Poin Utama)</label>
+                                <label class="fl">Pencapaian Utama (Poin)</label>
                                 <textarea id="expDesc" class="fi" rows="3" oninput="updatePreview()">• Melakukan maintenance rutin pada 50+ perangkat kantor.<br>• Membantu user dalam instalasi software dan troubleshooting jaringan LAN.<br>• Mendokumentasikan laporan bulanan untuk divisi IT.</textarea>
                             </div>
                         </div>
@@ -257,10 +257,10 @@
                 </div>
                 <div class="p-4 flex-grow relative">
                     <!-- Badge Copy -->
-                    <div class="absolute top-2 right-2">
-                        <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold border border-green-200">Siap Copy</span>
+                    <div class="absolute top-2 right-2 z-10">
+                        <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold border border-green-200 shadow-sm">Auto-Update</span>
                     </div>
-                    <div id="letterPreview" class="preview-box" contenteditable="true" oninput="manualEdit()"></div>
+                    <div id="letterPreview" class="preview-box" contenteditable="true" spellcheck="false"></div>
                 </div>
             </div>
 
@@ -282,12 +282,12 @@
 
     <script>
         // --- DATA & STATE ---
-        let isManualEdit = false;
+        // Kita menghapus flag isManualEdit agar tidak ada bug penghentian update
 
         function v(id) { return document.getElementById(id).value.trim(); }
         function vRaw(id) { return document.getElementById(id).value; }
 
-        // --- INTERACTION ---
+        // --- INTERAKSI ---
         function toggleAcc(el) {
             el.classList.toggle('text-blue-600');
             const body = el.nextElementSibling;
@@ -314,11 +314,6 @@
             }
         }
 
-        function manualEdit() {
-            isManualEdit = true;
-            document.querySelector('.bg-green-100').textContent = "Mode Edit Manual";
-        }
-
         function clearData() {
             if(confirm("Kosongkan semua formulir?")) {
                 document.querySelectorAll('input, textarea').forEach(el => el.value = '');
@@ -328,7 +323,8 @@
 
         // --- CORE LOGIC: GENERATE LETTER ---
         function updatePreview() {
-            if(isManualEdit) return; // Jangan override jika user sedang edit manual
+            // Fungsi ini dipanggil OTOMATIS setiap ada input dari user.
+            // Tidak ada blokir if(manualEdit) sehingga preview selalu sinkron.
 
             const hrName = v('targetHR') || "Bapak/Ibu HRD yang Terhormat";
             const myName = v('nama') || "Nama Lengkap";
@@ -336,7 +332,7 @@
             const lokasi = v('lokasi');
             const kontak = (v('email') ? v('email') : "") + (v('phone') ? " / " + v('phone') : "");
             const portfolio = v('portfolio');
-            const summary = v('summary') || "Saya adalah seorang profesional yang berdedikasi.";
+            const summary = v('summary') || "Saya adalah orang profesional yang berdedikasi.";
             
             // Data Pengalaman & Pendidikan
             const expTitle = v('expTitle') || "";
@@ -362,18 +358,20 @@
             
             // 2. Pembukaan (Hook)
             letter += `Perkenalkan saya, ${myName}${tempat}. `;
-            letter += `Saya menulis surat ini untuk mengungkapkan minat saya pada posisi ${posisi} di perusahaan Anda. `;
+            letter += `Saya menulis surat ini untuk menyatakan ketertarikan saya pada posisi ${posisi} di perusahaan Anda. `;
             letter += `${summary}\n\n`;
             
-            // 3. Badan (Pengalaman & Edukasi)
+            // 3. Badan (Pengalaman & Pendidikan)
             if (expTitle || eduName) {
                 letter += `Selama perjalanan karir dan pendidikan saya, saya telah mengembangkan kompetensi yang relevan untuk peran ini:\n\n`;
                 
                 // Pengalaman
                 if (expTitle && expComp) {
                     letter += `• Terakhir bekerja sebagai <strong>${expTitle}</strong> di ${expComp}, `;
-                    letter += `dimana saya berhasil ${expDesc.replace(/\n/g, ' ').replace(/•/g, 'dan ')}. `;
-                    letter += `Pengalaman ini melatih ketelitian dan kemampuan pemecahan masalah saya di lingkungan kerja nyata.\n`;
+                    // Bersihkan teks agar tidak ada <br> HTML saat kirim email
+                    const cleanDesc = expDesc.replace(/<br>/g, ' ').replace(/•/g, '').replace(/\n/g, ' ');
+                    letter += `dimana saya berhasil ${cleanDesc}. `;
+                    letter += `Pengalaman ini mengajarkan saya ketelitian dan kemampuan pemecahan masalah dalam lingkungan kerja nyata.\n`;
                 }
 
                 // Pendidikan
@@ -384,7 +382,8 @@
                 
                 // Skills
                 if (skills) {
-                    letter += `• Selain itu, saya menguasai beberapa keterampilan pendukung seperti: <strong>${skills}</strong>.\n`;
+                    const cleanSkills = skills.replace(/\n/g, ', ');
+                    letter += `• Selain itu, saya menguasai beberapa keterampilan pendukung seperti: <strong>${cleanSkills}</strong>.\n`;
                 }
                 
                 letter += `\n`;
@@ -392,4 +391,45 @@
 
             // 4. Penutup
             letter += `Saya sangat antusias untuk kesempatan berkontribusi bersama tim ${expComp ? expComp : 'Anda'}. `;
-            letter += `Saya percaya bahwa etos kerja d
+            letter += `Saya yakin bahwa etos kerja dan semangat belajar saya akan menjadi nilai tambahan bagi perusahaan.\n\n`;
+            
+            letter += `Saya telah melampirkan CV dan portofolio saya untuk pertimbangan Anda. `;
+            if (portfolio) letter += `Anda juga dapat melihat profil lengkap saya di: ${portfolio}. `;
+            letter += `Saya sangat mengharapkan kesempatan untuk wawancara dan mendiskusikan lebih lanjut bagaimana saya dapat memberikan kontribusi terbaik.\n\n`;
+            
+            letter += `Terima kasih atas waktu dan pertimbangan Anda.\n\n`;
+            letter += `Hormat saya,\n${myName}`;
+            if (kontak) letter += `\n${kontak}`;
+
+            // Set ke Textarea
+            const previewEl = document.getElementById('letterPreview');
+            previewEl.textContent = letter;
+        }
+
+        function copyEmail() {
+            const text = document.getElementById('letterPreview').textContent;
+            if(!text.trim()) return;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast("Surat email berhasil disalin! Silakan paste di Gmail.");
+            }).catch(err => {
+                showToast("Gagal menyalin teks.");
+                console.error(err);
+            });
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Init
+        window.onload = function() {
+            updatePreview();
+        };
+    </script>
+</body>
+</html>
