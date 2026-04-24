@@ -1,787 +1,395 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Orilix.net | Kelas Saya</title>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --primary: #2563eb;
-      --secondary: #1e40af;
-      --bg: #f3f4f6;
-      --card: #fff;
-      --text: #111;
-      --muted: #6b7280;
-      --success: #10b981;
-      --warning: #f59e0b;
-      --chat-bg: #f9fafb;
-      --chat-border: #e5e7eb;
-    }
-    body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-      user-select: none;
-    }
-    header {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff;
-      padding: 1.5rem;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-    .container {
-      max-width: 1280px;
-      margin: 2rem auto;
-      padding: 1rem;
-    }
-    .box {
-      background: var(--card);
-      padding: 2.5rem;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-      margin-bottom: 2.5rem;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .box:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.12);
-    }
-    .courses-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-    .course-card {
-      background: linear-gradient(145deg, #ffffff, #f8fafc);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .course-card:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 10px 28px rgba(0,0,0,0.1);
-    }
-    .lesson-wrapper {
-      display: flex;
-      flex-direction: row;
-      gap: 2rem;
-    }
-    .lesson-sidebar {
-      flex: 1 1 300px;
-      background: linear-gradient(145deg, #ffffff, #f8fafc);
-      border-radius: 16px;
-      padding: 1.5rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      height: fit-content;
-      max-height: 85vh;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: #cbd5e1 #f1f5f9;
-    }
-    .lesson-item {
-      padding: 0.8rem 1rem;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.6rem;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
-      font-size: 1rem;
-    }
-    .lesson-item:hover {
-      background: #f1f5f9;
-      transform: translateX(4px);
-    }
-    .lesson-active {
-      background: #dbeafe;
-      font-weight: 600;
-      box-shadow: inset 0 0 0 1px #3b82f6;
-    }
-    .lesson-completed {
-      color: var(--success);
-    }
-    .lesson-inprogress {
-      color: var(--warning);
-    }
-    .lesson-content {
-      flex: 3 1 800px;
-      background: linear-gradient(145deg, #ffffff, #f8fafc);
-      border-radius: 16px;
-      padding: 2rem;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-      position: relative;
-    }
-    .video-container {
-      position: relative;
-      overflow: hidden;
-      border-radius: 12px;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-      width: 100%;
-      height: auto;
-      padding: 0;
-      margin: 0;
-    }
-    video {
-      width: 100%;
-      height: auto;
-      display: block;
-      margin: 0;
-      padding: 0;
-    }
-    video::-webkit-media-controls-download-button,
-    video::-webkit-media-controls-panel [title="Download"] {
-      display: none !important;
-    }
-    .lesson-actions {
-      display: flex;
-      justify-content: flex-start;
-      align-items: center;
-      margin-top: 1.5rem;
-      gap: 1.5rem;
-    }
-    .lesson-nav {
-      display: flex;
-      gap: 1rem;
-    }
-    .icon-btn {
-      background: #f1f5f9;
-      border: none;
-      border-radius: 50%;
-      padding: 0.8rem;
-      cursor: pointer;
-      transition: background 0.3s ease, transform 0.3s ease;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-    .icon-btn:hover {
-      background: #e2e8f0;
-      transform: scale(1.1);
-    }
-    .icon-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-    .fullscreen-btn {
-      position: absolute;
-      bottom: 1rem;
-      right: 1rem;
-      background: rgba(0,0,0,0.5);
-      border: none;
-      border-radius: 50%;
-      padding: 0.6rem;
-      cursor: pointer;
-      color: #fff;
-      transition: background 0.3s ease;
-      z-index: 10;
-    }
-    .fullscreen-btn:hover {
-      background: rgba(0,0,0,0.7);
-    }
-    .chat-container {
-      position: fixed;
-      bottom: 80px;
-      right: 1rem;
-      width: 360px;
-      height: 500px;
-      background: var(--chat-bg);
-      border: 1px solid var(--chat-border);
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-      display: none;
-      flex-direction: column;
-      overflow: hidden;
-      z-index: 100;
-      transform: translateY(20px);
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      opacity: 0;
-    }
-    .chat-container.active {
-      display: flex;
-      transform: translateY(0);
-      opacity: 1;
-    }
-    .chat-header {
-      background: var(--primary);
-      color: #fff;
-      padding: 1rem;
-      font-weight: 600;
-      text-align: center;
-      position: relative;
-    }
-    .chat-close {
-      position: absolute;
-      top: 50%;
-      right: 1rem;
-      transform: translateY(-50%);
-      color: #fff;
-      cursor: pointer;
-      font-size: 1.5rem;
-      padding: 0.5rem;
-      transition: color 0.3s, background 0.3s;
-      border-radius: 50%;
-    }
-    .chat-close:hover {
-      color: #fff;
-      background: rgba(255,255,255,0.2);
-    }
-    .chat-messages {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-    .chat-message {
-      padding: 0.8rem 1rem;
-      border-radius: 12px;
-      margin-bottom: 1rem;
-      max-width: 80%;
-    }
-    .chat-message.user {
-      background: var(--primary);
-      color: #fff;
-      margin-left: auto;
-    }
-    .chat-message.bot {
-      background: #e5e7eb;
-      color: var(--text);
-    }
-    .chat-input {
-      display: flex;
-      padding: 1rem;
-      border-top: 1px solid var(--chat-border);
-    }
-    .chat-input input {
-      flex: 1;
-      padding: 0.8rem;
-      border: 1px solid var(--chat-border);
-      border-radius: 8px 0 0 8px;
-      outline: none;
-    }
-    .chat-input button {
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      padding: 0.8rem 1.2rem;
-      border-radius: 0 8px 8px 0;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .chat-input button:hover {
-      background: var(--secondary);
-    }
-    .chat-toggle {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      cursor: pointer;
-      font-size: 1.5rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: transform 0.3s;
-    }
-    .chat-toggle:hover {
-      transform: scale(1.1);
-    }
-    /* Login Page Styles */
-    .login-box {
-      max-width: 420px;
-      margin: 4rem auto;
-      padding: 2.5rem;
-      background: linear-gradient(145deg, #ffffff, #f8fafc);
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .login-box:hover {
-      transform: translateY(-6px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.14);
-    }
-    .login-box h2 {
-      font-size: 1.875rem;
-      font-weight: 700;
-      color: var(--text);
-      text-align: center;
-      margin-bottom: 1.25rem;
-    }
-    .login-box p {
-      text-align: center;
-      color: var(--muted);
-      margin-bottom: 2rem;
-      font-size: 1rem;
-    }
-    .input-group {
-      position: relative;
-      margin-bottom: 1.75rem;
-    }
-    .input-group i {
-      position: absolute;
-      top: 50%;
-      left: 1.25rem;
-      transform: translateY(-50%);
-      color: var(--muted);
-      font-size: 1.1rem;
-    }
-    .login-box input {
-      width: 100%;
-      padding: 1rem 1rem 1rem 3rem;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      font-size: 1rem;
-      background: #f8fafc;
-      transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-    }
-    .login-box input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(37,99,235,0.15);
-      background: #fff;
-      outline: none;
-    }
-    .error-message {
-      color: #ef4444;
-      font-size: 0.95rem;
-      text-align: center;
-      margin-top: 0.75rem;
-      display: none;
-      font-weight: 500;
-    }
-    @media (max-width: 1024px) {
-      .lesson-wrapper {
-        gap: 1.5rem;
-      }
-      .lesson-sidebar {
-        flex: 1 1 250px;
-      }
-      .lesson-content {
-        flex: 3 1 600px;
-      }
-    }
-    @media (max-width: 768px) {
-      .lesson-wrapper {
-        flex-direction: column;
-      }
-      .lesson-sidebar {
-        height: auto;
-        max-height: none;
-      }
-      .login-box {
-        margin: 3rem 1.5rem;
-        padding: 2rem;
-      }
-      .video-container {
-        aspect-ratio: 16 / 9;
-      }
-      .chat-container {
-        width: 90%;
-        max-width: 360px;
-        height: 400px;
-        bottom: 80px;
-        right: 1rem;
-      }
-      .chat-toggle {
-        bottom: 1.5rem;
-        right: 1.5rem;
-      }
-    }
-    @media (max-width: 480px) {
-      .container {
-        padding: 0.5rem;
-      }
-      .box {
-        padding: 1.5rem;
-      }
-      .course-card {
-        padding: 1.5rem;
-      }
-      .lesson-content {
-        padding: 1.5rem;
-      }
-      .lesson-actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .lesson-nav {
-        justify-content: space-between;
-      }
-      .icon-btn {
-        padding: 0.6rem;
-      }
-      .fullscreen-btn {
-        bottom: 0.5rem;
-        right: 0.5rem;
-      }
-      .chat-container {
-        width: 95%;
-        height: 350px;
-      }
-      .chat-input input {
-        padding: 0.6rem;
-        font-size: 0.9rem;
-      }
-      .chat-input button {
-        padding: 0.6rem 1rem;
-        font-size: 0.9rem;
-      }
-      .chat-header {
-        padding: 0.8rem;
-        font-size: 1rem;
-      }
-      .chat-close {
-        font-size: 1.2rem;
-        padding: 0.4rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writehub - Email Cover Letter Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #2563eb; /* Royal Blue */
+            --primary-dark: #1e40af;
+            --bg-surface: #f1f5f9;
+            --card: #ffffff;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --muted: #64748b;
+        }
+        body.dark-mode {
+            --bg-surface: #0f172a;
+            --card: #1e293b;
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+            background: var(--bg-surface);
+            color: var(--text);
+            transition: background .3s, color .3s;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism */
+        .glass-card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Inputs */
+        .fi {
+            width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
+            border-radius: 12px; font-family: inherit; font-size: 14px;
+            color: var(--text); background: var(--card); transition: all 0.2s;
+        }
+        .dark-mode .fi { background: rgba(30, 41, 59, 0.5); color: #e2e8f0; border-color: #334155; }
+        .fi:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); outline: none; }
+
+        /* Label */
+        .fl { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
+        .fl span.req { color: var(--danger); }
+
+        /* Accordion */
+        .acc-hd { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; cursor: pointer; border-bottom: 1px solid var(--border); user-select: none; }
+        .acc-hd:hover { color: var(--primary); }
+        .acc-hd .ic { transition: transform 0.3s; }
+        .acc-bd { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding-bottom: 0; }
+        .acc-bd.open { max-height: 2000px; padding-bottom: 20px; }
+
+        /* Preview Box */
+        .preview-box {
+            background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px;
+            font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: #333;
+            white-space: pre-wrap; padding: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+        .dark-mode .preview-box { background: #0f172a; color: #cbd5e1; border-color: #334155; }
+
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px;
+            background: #1e293b; color: white; padding: 12px 24px;
+            border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            opacity: 0; transform: translateY(20px); transition: 0.3s; z-index: 9999;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 768px) {
+            .grid-container { display: flex; flex-direction: column; }
+            .preview-col { order: -1; } /* Preview di atas di mobile */
+        }
+    </style>
 </head>
 <body>
-<header>
-  <h1 class="text-3xl font-bold tracking-tight">Orilix.net - Akses Kelas</h1>
-</header>
 
-<div class="container">
-  <!-- Login -->
-  <div id="login" class="login-box" style="display: none;">
-    <h2>Masuk ke Kelas</h2>
-    <p>Silakan masukkan akun Anda untuk melanjutkan</p>
-    <div class="input-group">
-      <i class="fas fa-envelope"></i>
-      <input type="email" id="email" placeholder="Email" required />
-    </div>
-    <div class="input-group">
-      <i class="fas fa-lock"></i>
-      <input type="password" id="password" placeholder="Kata Sandi" required />
-    </div>
-    <p id="error-message" class="error-message">Login gagal, periksa email atau kata sandi</p>
-    <button onclick="login()" class="w-full bg-blue-600 text-white font-medium rounded-xl px-4 py-3 hover:bg-blue-700 transition duration-300 ease-in-out">Masuk Sekarang</button>
-  </div>
-
-  <!-- Courses -->
-  <div id="courses" class="box" style="display: none;">
-    <h2 class="text-2xl font-bold mb-6 tracking-tight">Daftar Kursus Saya</h2>
-    <p class="text-gray-600 mb-8 text-lg">Berikut daftar kursus yang sudah Anda beli</p>
-    <div id="courses-grid" class="courses-grid"></div>
-  </div>
-
-  <!-- Lessons -->
-  <div id="lessons" style="display: none;">
-    <h2 id="course-title" class="text-2xl font-bold mb-8 tracking-tight"></h2>
-    <div class="lesson-wrapper">
-      <div class="lesson-sidebar">
-        <h3 class="text-xl font-semibold mb-6 tracking-tight">Daftar Pelajaran</h3>
-        <div id="lesson-list" class="lesson-list"></div>
-      </div>
-      <div class="lesson-content">
-        <h3 id="lesson-title" class="text-xl font-semibold mb-6 tracking-tight"></h3>
-        <div class="video-container">
-          <video id="lesson-video" controls controlsList="nodownload" autoplay></video>
-          <button class="fullscreen-btn" onclick="toggleFullScreen()">
-            <i class="fas fa-expand"></i>
-          </button>
+<div class="min-h-screen flex flex-col">
+    <!-- NAVBAR -->
+    <nav class="bg-blue-950 text-white sticky top-0 z-50 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                    <i class="fa-solid fa-paper-plane text-blue-400 text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Email <span class="text-blue-400">Generator</span></h1>
+                    <p class="text-[10px] text-blue-300 tracking-widest uppercase">Professional Cover Letter</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleDark()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition text-blue-200">
+                    <i class="fa-solid fa-moon text-sm"></i>
+                </button>
+                <button onclick="copyEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20">
+                    <i class="fa-regular fa-copy"></i> Salin Surat
+                </button>
+            </div>
         </div>
-        <div class="lesson-actions">
-          <div class="lesson-nav">
-            <button id="prev-lesson" class="icon-btn disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M15 18L9 12L15 6" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-            <button id="next-lesson" class="icon-btn disabled:opacity-50 disabled:cursor-not-allowed">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M9 18L15 12L9 6" stroke="#374151" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
-            </button>
-          </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-8 grid-container grid grid-cols-1 lg:grid-cols-2 gap-8 flex-grow">
+        
+        <!-- KIRI: FORM INPUT -->
+        <div class="space-y-6">
+            <!-- HEADER KARTU -->
+            <div class="glass-card rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-2">
+                    <h2 class="text-lg font-bold text-[var(--text)]">Data Pelamar</h2>
+                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">INPUT</span>
+                </div>
+                <p class="text-xs text-[var(--muted)]">Isi data diri dan pengalaman Anda di bawah ini untuk menyusun surat lamaran.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-6 space-y-6">
+                
+                <!-- Target -->
+                <div class="p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
+                    <label class="fl text-blue-800">Target Lamaran</label>
+                    <div class="grid gap-4">
+                        <input id="targetHR" class="fi" placeholder="Contoh: Bapak Budi Santoso (HRD Manager)">
+                        <input id="targetPos" class="fi" placeholder="Contoh: Staff IT Support">
+                    </div>
+                </div>
+
+                <!-- Accordion Sections -->
+                
+                <!-- 1. Data Diri -->
+                <div>
+                    <div class="acc-hd" onclick="toggleAcc(this)">
+                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-user w-5"></i> Data Diri</span>
+                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
+                    </div>
+                    <div class="acc-bd open space-y-4">
+                        <div>
+                            <label class="fl">Nama Lengkap <span class="req">*</span></label>
+                            <input id="nama" class="fi" value="Muhammad Hafis" oninput="updatePreview()">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="fl">Email</label>
+                                <input id="email" class="fi" type="email" value="hafis@email.com" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label class="fl">No. Telepon</label>
+                                <input id="phone" class="fi" value="0856-1234-5678" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="fl">Domisili / Kota</label>
+                            <input id="lokasi" class="fi" value="Pekalongan, Jawa Tengah" oninput="updatePreview()">
+                        </div>
+                        <div>
+                            <label class="fl">Portfolio / Link (Opsional)</label>
+                            <input id="portfolio" class="fi" placeholder="Link LinkedIn atau Website" oninput="updatePreview()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Summary (Introduksi) -->
+                <div>
+                    <div class="acc-hd" onclick="toggleAcc(this)">
+                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-align-left w-5"></i> Ringkasan Diri</span>
+                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
+                    </div>
+                    <div class="acc-bd open">
+                        <p class="text-xs text-[var(--muted)] mb-2">Paragraf pembuka yang menjelaskan siapa Anda dan mengapa Anda tertarik dengan posisi ini.</p>
+                        <textarea id="summary" class="fi" rows="4" oninput="updatePreview()">Lulusan SMK Teknik Jaringan Komputer yang antusias dan memiliki ketertarikan kuat pada dunia IT Support. Terbiasa melakukan troubleshooting hardware dan software, serta konfigurasi jaringan dasar. Saya adalah pribadi yang cepat belajar, teliti, dan siap memberikan kontribusi nyata untuk tim IT.</textarea>
+                    </div>
+                </div>
+
+                <!-- 3. Pengalaman -->
+                <div>
+                    <div class="acc-hd" onclick="toggleAcc(this)">
+                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-briefcase w-5"></i> Pengalaman Utama</span>
+                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
+                    </div>
+                    <div class="acc-bd open">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="fl">Jabatan Terakhir</label>
+                                <input id="expTitle" class="fi" value="IT Support Intern" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label class="fl">Nama Perusahaan</label>
+                                <input id="expComp" class="fi" value="PT. Teknologi Nusantara" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label class="fl">Pencapaian Utama (Poin Utama)</label>
+                                <textarea id="expDesc" class="fi" rows="3" oninput="updatePreview()">• Melakukan maintenance rutin pada 50+ perangkat kantor.<br>• Membantu user dalam instalasi software dan troubleshooting jaringan LAN.<br>• Mendokumentasikan laporan bulanan untuk divisi IT.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Pendidikan -->
+                <div>
+                    <div class="acc-hd" onclick="toggleAcc(this)">
+                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-graduation-cap w-5"></i> Pendidikan Terakhir</span>
+                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
+                    </div>
+                    <div class="acc-bd open">
+                        <div class="space-y-3">
+                            <div>
+                                <label class="fl">Nama Sekolah / Universitas</label>
+                                <input id="eduName" class="fi" value="SMK Nurul Ummah Paninggaran" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label class="fl">Jurusan</label>
+                                <input id="eduMajor" class="fi" value="Teknik Jaringan Komputer dan Telekomunikasi" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label class="fl">Tahun Lulus / Periode</label>
+                                <input id="eduYear" class="fi" value="Lulus tahun 2024" oninput="updatePreview()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Keahlian -->
+                <div>
+                    <div class="acc-hd" onclick="toggleAcc(this)">
+                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-tools w-5"></i> Keahlian (Highlight)</span>
+                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
+                    </div>
+                    <div class="acc-bd open">
+                        <p class="text-xs text-[var(--muted)] mb-2">Keahlian yang relevan dengan posisi (pisahkan dengan koma).</p>
+                        <textarea id="skills" class="fi" rows="2" oninput="updatePreview()">Microsoft Office, Troubleshooting Hardware, Instalasi Jaringan LAN/WAN, MikroTik Dasar, Linux Basic</textarea>
+                    </div>
+                </div>
+
+            </div>
         </div>
-      </div>
+
+        <!-- KANAN: PREVIEW & ACTION -->
+        <div class="preview-col flex flex-col h-full space-y-4">
+            <div class="glass-card rounded-2xl p-1 flex-grow flex flex-col">
+                <div class="p-4 border-b border-[var(--border)] flex justify-between items-center bg-[var(--bg-surface)] rounded-t-xl">
+                    <span class="font-bold text-[var(--text)]"><i class="fa-solid fa-eye mr-2"></i>Pratinjau Surat</span>
+                    <div class="flex gap-2">
+                        <button onclick="clearData()" class="text-xs text-red-500 hover:text-red-600 font-semibold px-2 py-1">Reset</button>
+                    </div>
+                </div>
+                <div class="p-4 flex-grow relative">
+                    <!-- Badge Copy -->
+                    <div class="absolute top-2 right-2">
+                        <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold border border-green-200">Siap Copy</span>
+                    </div>
+                    <div id="letterPreview" class="preview-box" contenteditable="true" oninput="manualEdit()"></div>
+                </div>
+            </div>
+
+            <!-- Action Button Fixed Bottom -->
+            <div class="glass-card p-4 rounded-2xl flex items-center justify-between">
+                <div class="text-sm text-[var(--muted)]">
+                    <i class="fa-solid fa-circle-info mr-1"></i> Pastek langsung ke email Anda.
+                </div>
+                <button onclick="copyEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-base transition shadow-lg shadow-blue-600/30 flex items-center gap-2 transform active:scale-95">
+                    <i class="fa-solid fa-paper-plane"></i> Salin ke Clipboard
+                </button>
+            </div>
+        </div>
+
     </div>
-  </div>
-</div>
 
-<!-- Live Chat -->
-<button class="chat-toggle" onclick="toggleChat()">
-  <i class="fas fa-comment-dots"></i>
-</button>
-<div class="chat-container" id="chat-container">
-  <div class="chat-header">Live Chat Bantuan
-    <i class="fas fa-times chat-close" onclick="toggleChat()"></i>
-  </div>
-  <div class="chat-messages" id="chat-messages"></div>
-  <div class="chat-input">
-    <input type="text" id="chat-input" placeholder="Ketik pesan Anda..." onkeypress="if(event.keyCode==13) sendMessage()" />
-    <button onclick="sendMessage()">Kirim</button>
-  </div>
-</div>
+    <!-- Toast -->
+    <div id="toast" class="toast">Berhasil disalin!</div>
 
-<script>
-const supabaseUrl = "https://vzqrhpcmohxwcschepbt.supabase.co"; // Ganti dengan URL Supabase Anda
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6cXJocGNtb2h4d2NzY2hlcGJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYxMDI5OTUsImV4cCI6MjA3MTY3ODk5NX0.E3eM0o6Yo79xHrrtXs7FKyeBuTPzaH-BVC_KOhR2TF4"; // Ganti dengan kunci Supabase Anda
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    <script>
+        // --- DATA & STATE ---
+        let isManualEdit = false;
 
-let currentUser = null;
-let currentLessons = [];
-let currentLessonIndex = 0;
+        function v(id) { return document.getElementById(id).value.trim(); }
+        function vRaw(id) { return document.getElementById(id).value; }
 
-async function checkSession() {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    loadCourses();
-  } else {
-    document.getElementById("login").style.display = "block";
-  }
-}
+        // --- INTERACTION ---
+        function toggleAcc(el) {
+            el.classList.toggle('text-blue-600');
+            const body = el.nextElementSibling;
+            const icon = el.querySelector('.ic');
+            
+            if (body.classList.contains('open')) {
+                body.classList.remove('open');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                body.classList.add('open');
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
 
-async function login() {
-  const email = document.getElementById("email").value.trim().replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
-  const password = document.getElementById("password").value.trim().replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, '');
-  const errorMessage = document.getElementById("error-message");
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) {
-    errorMessage.style.display = "block";
-    return;
-  }
-  errorMessage.style.display = "none";
-  currentUser = data.user;
-  loadCourses();
-}
+        function toggleDark() {
+            document.body.classList.toggle('dark-mode');
+            const btn = document.querySelector('.fa-moon');
+            if (document.body.classList.contains('dark-mode')) {
+                btn.classList.remove('fa-moon');
+                btn.classList.add('fa-sun');
+            } else {
+                btn.classList.remove('fa-sun');
+                btn.classList.add('fa-moon');
+            }
+        }
 
-async function loadCourses() {
-  document.getElementById("login").style.display = "none";
-  const box = document.getElementById("courses");
-  box.style.display = "block";
-  const grid = document.getElementById("courses-grid");
-  grid.innerHTML = "<p class='text-center text-gray-500'>Memuat daftar kursus anda...</p>";
+        function manualEdit() {
+            isManualEdit = true;
+            document.querySelector('.bg-green-100').textContent = "Mode Edit Manual";
+        }
 
-  const { data, error } = await supabase
-    .from("user_courses")
-    .select("courses(id, title, description, instructor)")
-    .eq("user_id", currentUser.id);
+        function clearData() {
+            if(confirm("Kosongkan semua formulir?")) {
+                document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+                updatePreview();
+            }
+        }
 
-  if (error) {
-    grid.innerHTML = "<p class='text-center text-red-500'>Error memuat kursus</p>";
-    return;
-  }
-  if (!data || data.length === 0) {
-    grid.innerHTML = "<p class='text-center text-gray-500'>Belum ada kursus yang aktif</p>";
-    return;
-  }
+        // --- CORE LOGIC: GENERATE LETTER ---
+        function updatePreview() {
+            if(isManualEdit) return; // Jangan override jika user sedang edit manual
 
-  grid.innerHTML = data.map(c => {
-    const course = c.courses;
-    return `
-      <div class="course-card">
-        <h3 class="text-xl font-semibold text-blue-600 mb-3 tracking-tight">${course.title}</h3>
-        <p class="text-base text-gray-600 mb-5 leading-relaxed">${course.description}</p>
-        <p class="text-base text-gray-700 mb-5"><strong>Instruktur:</strong> ${course.instructor}</p>
-        <button onclick="loadLessons('${course.id}', '${course.title}')" class="w-full bg-blue-600 text-white font-medium rounded-xl px-4 py-3 hover:bg-blue-700 transition duration-300 ease-in-out">Mulai Belajar →</button>
-      </div>
-    `;
-  }).join("");
-}
+            const hrName = v('targetHR') || "Bapak/Ibu HRD yang Terhormat";
+            const myName = v('nama') || "Nama Lengkap";
+            const posisi = v('targetPos') || "Posisi yang dilamar";
+            const lokasi = v('lokasi');
+            const kontak = (v('email') ? v('email') : "") + (v('phone') ? " / " + v('phone') : "");
+            const portfolio = v('portfolio');
+            const summary = v('summary') || "Saya adalah seorang profesional yang berdedikasi.";
+            
+            // Data Pengalaman & Pendidikan
+            const expTitle = v('expTitle') || "";
+            const expComp = v('expComp') || "";
+            const expDesc = v('expDesc') || "";
+            
+            const eduName = v('eduName') || "";
+            const eduMajor = v('eduMajor') || "";
+            const eduYear = v('eduYear') || "";
+            
+            const skills = v('skills') || "";
 
-async function loadLessons(courseId, title) {
-  document.getElementById("courses").style.display = "none";
-  document.getElementById("lessons").style.display = "block";
-  document.getElementById("course-title").innerText = title;
+            // Format Tanggal Hari Ini
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const tanggal = new Date().toLocaleDateString('id-ID', options);
+            const tempat = lokasi ? `, ${lokasi}` : "";
 
-  const list = document.getElementById("lesson-list");
-  list.innerHTML = "<p class='text-center text-gray-500'>Memuat pelajaran...</p>";
+            // SUSUNAN SURAT
+            let letter = "";
 
-  const { data, error } = await supabase
-    .from("user_lessons")
-    .select("id, status, lesson_id, lessons(title, video_url, order_no, course_id)")
-    .eq("user_id", currentUser.id);
+            // 1. Kepala
+            letter += `${hrName},\n\n`;
+            
+            // 2. Pembukaan (Hook)
+            letter += `Perkenalkan saya, ${myName}${tempat}. `;
+            letter += `Saya menulis surat ini untuk mengungkapkan minat saya pada posisi ${posisi} di perusahaan Anda. `;
+            letter += `${summary}\n\n`;
+            
+            // 3. Badan (Pengalaman & Edukasi)
+            if (expTitle || eduName) {
+                letter += `Selama perjalanan karir dan pendidikan saya, saya telah mengembangkan kompetensi yang relevan untuk peran ini:\n\n`;
+                
+                // Pengalaman
+                if (expTitle && expComp) {
+                    letter += `• Terakhir bekerja sebagai <strong>${expTitle}</strong> di ${expComp}, `;
+                    letter += `dimana saya berhasil ${expDesc.replace(/\n/g, ' ').replace(/•/g, 'dan ')}. `;
+                    letter += `Pengalaman ini melatih ketelitian dan kemampuan pemecahan masalah saya di lingkungan kerja nyata.\n`;
+                }
 
-  if (error) {
-    list.innerHTML = "<p class='text-center text-red-500'>Error memuat pelajaran</p>";
-    return;
-  }
+                // Pendidikan
+                if (eduName) {
+                    letter += `• Lulusan dari <strong>${eduName}</strong> jurusan ${eduMajor} (${eduYear}). `;
+                    letter += `Latar belakang akademis ini memberikan saya fondasi teknis yang kuat untuk mendukung tugas-tugas di ${posisi}.\n`;
+                }
+                
+                // Skills
+                if (skills) {
+                    letter += `• Selain itu, saya menguasai beberapa keterampilan pendukung seperti: <strong>${skills}</strong>.\n`;
+                }
+                
+                letter += `\n`;
+            }
 
-  currentLessons = data
-    .filter(d => d.lessons && d.lessons.course_id === courseId)
-    .sort((a, b) => a.lessons.order_no - b.lessons.order_no);
-
-  if (currentLessons.length === 0) {
-    list.innerHTML = "<p class='text-center text-gray-500'>Tidak ada pelajaran</p>";
-    return;
-  }
-
-  currentLessonIndex = 0;
-  renderLessons();
-  playLesson(0);
-
-  const video = document.getElementById("lesson-video");
-  video.onended = function() {
-    markCompleted(currentLessons[currentLessonIndex].id);
-    if (currentLessonIndex < currentLessons.length - 1) {
-      playLesson(currentLessonIndex + 1);
-    }
-  };
-
-  document.getElementById("prev-lesson").addEventListener("click", () => {
-    if (currentLessonIndex > 0) playLesson(currentLessonIndex - 1);
-  });
-  document.getElementById("next-lesson").addEventListener("click", () => {
-    if (currentLessonIndex < currentLessons.length - 1) playLesson(currentLessonIndex + 1);
-  });
-}
-
-function renderLessons() {
-  const list = document.getElementById("lesson-list");
-  list.innerHTML = "";
-  list.innerHTML = currentLessons.map((l, i) => {
-    let cls = "lesson-item";
-    let icon = "<i class='fas fa-circle text-gray-400 text-sm mr-2'></i>";
-    if (l.status === "completed") {
-      icon = "<i class='fas fa-check-circle text-green-500 text-sm mr-2'></i>";
-      cls += " lesson-completed";
-    }
-    if (l.status === "in_progress") {
-      icon = "<i class='fas fa-dot-circle text-yellow-500 text-sm mr-2'></i>";
-      cls += " lesson-inprogress";
-    }
-    if (i === currentLessonIndex) cls += " lesson-active";
-    return `
-      <div class="${cls}" onclick="playLesson(${i})">
-        ${icon} ${l.lessons.order_no}. ${l.lessons.title}
-      </div>
-    `;
-  }).join("");
-
-  document.getElementById("prev-lesson").disabled = currentLessonIndex === 0;
-  document.getElementById("next-lesson").disabled = currentLessonIndex === currentLessons.length - 1;
-}
-
-function playLesson(i) {
-  currentLessonIndex = i;
-  const lesson = currentLessons[i];
-  document.getElementById("lesson-title").innerText = `${lesson.lessons.order_no}. ${lesson.lessons.title}`;
-  const video = document.getElementById("lesson-video");
-  video.src = lesson.lessons.video_url;
-  video.play();
-  renderLessons();
-  markInProgress(lesson.id);
-}
-
-async function markInProgress(userLessonId) {
-  await supabase.from("user_lessons")
-    .update({ status: "in_progress", last_watched_at: new Date() })
-    .eq("id", userLessonId)
-    .eq("user_id", currentUser.id);
-}
-
-async function markCompleted(userLessonId) {
-  await supabase.from("user_lessons")
-    .update({ status: "completed", last_watched_at: new Date() })
-    .eq("id", userLessonId)
-    .eq("user_id", currentUser.id);
-}
-
-// Full Screen Toggle
-function toggleFullScreen() {
-  const videoContainer = document.querySelector('.video-container');
-  if (!document.fullscreenElement) {
-    videoContainer.requestFullscreen().catch(err => {
-      console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-    });
-  } else {
-    document.exitFullscreen();
-  }
-}
-
-// Live Chat Functionality
-function toggleChat() {
-  const chatContainer = document.getElementById("chat-container");
-  if (chatContainer.classList.contains("active")) {
-    chatContainer.classList.remove("active");
-  } else {
-    chatContainer.classList.add("active");
-  }
-}
-
-function sendMessage() {
-  const input = document.getElementById("chat-input");
-  const message = input.value.trim();
-  if (!message) return;
-  const messages = document.getElementById("chat-messages");
-  const userMsg = document.createElement("div");
-  userMsg.classList.add("chat-message", "user");
-  userMsg.textContent = message;
-  messages.appendChild(userMsg);
-  messages.scrollTop = messages.scrollHeight;
-  input.value = "";
-
-  // Simulate bot response with more technical variety
-  setTimeout(() => {
-    let botResponse = "Terima kasih atas pertanyaannya. Tim support akan segera membantu!";
-    if (message.toLowerCase().includes("video")) {
-      const videoResponses = [
-        "Jika video tidak memuat, coba refresh halaman atau periksa koneksi internet Anda. Pastikan browser Anda up-to-date.",
-        "Untuk masalah kualitas video, sesuaikan pengaturan resolusi di kontrol video. Kami mendukung hingga 1080p.",
-        "Jika video terputus, ini mungkin karena buffer. Coba jeda sejenak atau kurangi kecepatan pemutaran.",
-        "Pastikan Anda menggunakan browser yang kompatibel seperti Chrome atau Firefox untuk pemutaran video optimal.",
-        "Jika ada error pada video, catat kode error dan kirimkan kepada kami untuk analisis lebih lanjut."
-      ];
-      botResponse = videoResponses[Math.floor(Math.random() * videoResponses.length)];
-    } else if (message.toLowerCase().includes("course") || message.toLowerCase().includes("kursus")) {
-      const courseResponses = [
-        "Untuk mengakses materi course, pastikan Anda telah menyelesaikan pembayaran dan login dengan akun yang benar.",
-        "Jika pelajaran course tidak muncul, coba logout dan login kembali, atau hubungi support untuk verifikasi akses.",
-        "Course kami dirancang dengan kurikulum industri, termasuk proyek nyata dan mentoring dari praktisi berpengalaman.",
-        "Untuk melacak progres course, periksa status pelajaran di sidebar. Hijau berarti selesai, kuning sedang dikerjakan.",
-        "Jika ada kesulitan teknis pada course, seperti error loading, coba clear cache browser Anda terlebih dahulu."
-      ];
-      botResponse = courseResponses[Math.floor(Math.random() * courseResponses.length)];
-    } else if (message.toLowerCase().includes("kendala") || message.toLowerCase().includes("masalah")) {
-      const issueResponses = [
-        "Deskripsikan kendala lebih detail, misalnya error code atau screenshot, agar kami bisa membantu lebih cepat.",
-        "Untuk kendala login, pastikan email dan password benar. Jika lupa password, gunakan fitur reset.",
-        "Jika ada masalah dengan pembayaran course, periksa transaksi bank Anda atau hubungi provider pembayaran.",
-        "Kendala umum pada video: pastikan ad blocker dimatikan, karena bisa mengganggu pemutaran.",
-        "Jika platform lambat, coba akses di waktu lain atau gunakan VPN jika ada pembatasan regional."
-      ];
-      botResponse = issueResponses[Math.floor(Math.random() * issueResponses.length)];
-    }
-    const botMsg = document.createElement("div");
-    botMsg.classList.add("chat-message", "bot");
-    botMsg.textContent = botResponse;
-    messages.appendChild(botMsg);
-    messages.scrollTop = messages.scrollHeight;
-  }, 1000);
-}
-
-// Anti-inspect, anti-injection, and protection
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => {
-  if (
-    e.key === 'F12' ||
-    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
-    (e.ctrlKey && e.key === 'U')
-  ) {
-    e.preventDefault();
-  }
-});
-document.addEventListener('wheel', e => {
-  if (e.ctrlKey) e.preventDefault();
-}, { passive: false });
-
-checkSession();
-</script>
-</body>
-</html>
+            // 4. Penutup
+            letter += `Saya sangat antusias untuk kesempatan berkontribusi bersama tim ${expComp ? expComp : 'Anda'}. `;
+            letter += `Saya percaya bahwa etos kerja d
