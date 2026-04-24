@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writehub - Email Cover Letter Generator</title>
+    <title>Writehub - Email Cover Letter Generator Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary: #2563eb; /* Royal Blue */
-            --primary-dark: #1e40af;
-            --bg-surface: #f1f5f9;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --bg-surface: #f8fafc;
             --card: #ffffff;
             --border: #e2e8f0;
             --text: #1e293b;
             --muted: #64748b;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
         body.dark-mode {
             --bg-surface: #0f172a;
@@ -24,66 +26,136 @@
             --text: #e2e8f0;
             --muted: #94a3b8;
             --border: #334155;
+            --primary-light: #1e3a8a;
         }
 
         body {
             font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
             background: var(--bg-surface);
             color: var(--text);
-            transition: background .3s, color .3s;
+            transition: background-color 0.3s ease, color 0.3s ease;
             min-height: 100vh;
         }
 
-        /* Glassmorphism */
+        /* Glassmorphism Card */
         .glass-card {
             background: var(--card);
-            backdrop-filter: blur(12px);
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow);
+            transition: background 0.3s, border-color 0.3s;
         }
 
-        /* Inputs */
+        /* Custom Input Styling */
         .fi {
-            width: 100%; padding: 12px 16px; border: 1.5px solid var(--border);
-            border-radius: 12px; font-family: inherit; font-size: 14px;
-            color: var(--text); background: var(--card); transition: all 0.2s;
+            width: 100%; 
+            padding: 12px 16px; 
+            border: 1.5px solid var(--border);
+            border-radius: 10px; 
+            font-family: inherit; 
+            font-size: 14px;
+            color: var(--text); 
+            background: var(--card); 
+            transition: all 0.2s ease;
+            resize: vertical;
         }
-        .dark-mode .fi { background: rgba(30, 41, 59, 0.5); color: #e2e8f0; border-color: #334155; }
-        .fi:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15); outline: none; }
+        .fi:focus {
+            border-color: var(--primary); 
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
+            outline: none; 
+            background: var(--bg-surface);
+        }
 
         /* Label */
-        .fl { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); margin-bottom: 6px; }
+        .fl { 
+            display: block; 
+            font-size: 11px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.05em; 
+            color: var(--muted); 
+            margin-bottom: 6px; 
+        }
         .fl span.req { color: #ef4444; }
 
         /* Accordion */
-        .acc-hd { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; cursor: pointer; border-bottom: 1px solid var(--border); user-select: none; }
-        .acc-hd:hover { color: var(--primary); }
-        .acc-hd .ic { transition: transform 0.3s; }
-        .acc-bd { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; padding-bottom: 0; }
-        .acc-bd.open { max-height: 2000px; padding-bottom: 20px; }
-
-        /* Preview Box */
-        .preview-box {
-            background: #fafafa; border: 1px solid #e5e7eb; border-radius: 8px;
-            font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; color: #333;
-            white-space: pre-wrap; padding: 20px;
-            min-height: 400px;
-            position: relative;
+        .acc-item { border-bottom: 1px solid var(--border); }
+        .acc-item:last-child { border-bottom: none; }
+        
+        .acc-hd { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 16px 0; cursor: pointer; user-select: none;
+            transition: color 0.2s;
         }
-        .dark-mode .preview-box { background: #0f172a; color: #cbd5e1; border-color: #334155; }
+        .acc-hd:hover .acc-title { color: var(--primary); }
+        .acc-title { font-weight: 600; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+        .acc-hd .ic { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); font-size: 12px; color: var(--muted); }
+        .acc-item.active .acc-hd .ic { transform: rotate(180deg); }
+        
+        .acc-bd { 
+            max-height: 0; overflow: hidden; 
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s;
+            opacity: 0; 
+        }
+        .acc-item.active .acc-bd { 
+            max-height: 800px; /* Cukup besar untuk konten panjang */
+            opacity: 1;
+            padding-bottom: 20px;
+        }
 
-        /* Toast */
+        /* Preview Box Styling */
+        .preview-wrapper {
+            position: relative;
+            background: var(--bg-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        #letterPreview {
+            font-family: 'Inter', sans-serif; 
+            font-size: 14px; 
+            line-height: 1.7; 
+            color: var(--text);
+            padding: 30px;
+            min-height: 500px;
+            max-height: 700px;
+            overflow-y: auto;
+            white-space: pre-wrap; /* Menjaga formatting paragraf */
+            flex-grow: 1;
+            outline: none;
+        }
+        
+        #letterPreview:focus {
+            background: rgba(0,0,0,0.01);
+        }
+
+        /* Toast Notification */
         .toast {
             position: fixed; bottom: 30px; right: 30px;
-            background: #1e293b; color: white; padding: 12px 24px;
-            border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            opacity: 0; transform: translateY(20px); transition: 0.3s; z-index: 9999;
+            background: var(--text); color: var(--bg-surface); 
+            padding: 14px 24px; border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            opacity: 0; transform: translateY(20px); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            z-index: 9999; font-weight: 500; display: flex; align-items: center; gap: 10px;
         }
         .toast.show { opacity: 1; transform: translateY(0); }
+        .toast i { color: #4ade80; }
 
-        @media (max-width: 768px) {
+        /* Scrollbar customization */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+        /* Mobile Handling */
+        @media (max-width: 1024px) {
             .grid-container { display: flex; flex-direction: column; }
-            .preview-col { order: -1; } 
+            .preview-col { order: -1; height: auto; min-height: 500px; }
+            #letterPreview { min-height: 400px; }
+            .sticky-header { position: relative; }
         }
     </style>
 </head>
@@ -91,345 +163,388 @@
 
 <div class="min-h-screen flex flex-col">
     <!-- NAVBAR -->
-    <nav class="bg-blue-950 text-white sticky top-0 z-50 shadow-xl">
+    <nav class="sticky top-0 z-50 bg-blue-950 text-white shadow-lg border-b border-blue-900/50 backdrop-blur-md">
         <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-lg bg-blue-500/20 flex items-center justify-center">
-                    <i class="fa-solid fa-paper-plane text-blue-400 text-lg"></i>
+                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-paper-plane text-white text-lg"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-tight">Email <span class="text-blue-400">Generator</span></h1>
-                    <p class="text-[10px] text-blue-300 tracking-widest uppercase">Professional Cover Letter</p>
+                    <h1 class="text-lg font-bold tracking-tight leading-tight">Email <span class="text-blue-400">Generator</span></h1>
+                    <p class="text-[10px] text-blue-300 tracking-widest uppercase opacity-80">Professional Cover Letter</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="toggleDark()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition text-blue-200">
-                    <i class="fa-solid fa-moon text-sm"></i>
+                <button onclick="toggleDark()" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition text-blue-200 border border-white/5" aria-label="Toggle Dark Mode">
+                    <i class="fa-solid fa-moon text-sm transition-transform" id="theme-icon"></i>
                 </button>
-                <button onclick="copyEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20">
-                    <i class="fa-regular fa-copy"></i> Salin Surat
+                <button onclick="copyEmail()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg font-semibold text-sm transition flex items-center gap-2 shadow-lg shadow-blue-900/20 active:scale-95">
+                    <i class="fa-regular fa-copy"></i> <span class="hidden sm:inline">Salin</span>
                 </button>
             </div>
         </div>
     </nav>
 
-    <div class="max-w-7xl mx-auto px-4 md:px-6 py-8 grid-container grid grid-cols-1 lg:grid-cols-2 gap-8 flex-grow">
+    <div class="max-w-7xl mx-auto px-4 md:px-6 py-8 grid-container grid grid-cols-1 lg:grid-cols-12 gap-8 flex-grow">
         
-        <!-- KIRI: FORM INPUT -->
-        <div class="space-y-6">
-            <!-- HEADER KARTU -->
-            <div class="glass-card rounded-2xl p-6">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-bold text-[var(--text)]">Data Pelamar</h2>
-                    <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold">INPUT</span>
+        <!-- KIRI: FORM INPUT (Occupies 5 columns) -->
+        <div class="lg:col-span-5 space-y-6 h-fit">
+            
+            <div class="glass-card rounded-2xl p-6 sticky-header">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-[var(--text)]">Formulir Data</h2>
+                    <span class="bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 px-3 py-1 rounded-full text-[10px] font-bold tracking-wide">INPUT MODE</span>
                 </div>
-                <p class="text-xs text-[var(--muted)]">Isi data diri dan pengalaman Anda di bawah ini untuk menyusun surat lamaran.</p>
-            </div>
+                <p class="text-xs text-[var(--muted)] mb-4">Lengkapi data di bawah ini. Surat akan dibuat otomatis di sebelah kanan.</p>
 
-            <div class="glass-card rounded-2xl p-6 space-y-6">
-                
-                <!-- Target -->
-                <div class="p-4 bg-blue-50/50 border border-blue-100 rounded-xl">
-                    <label class="fl text-blue-800">Target Lamaran</label>
-                    <div class="grid gap-4">
-                        <input id="targetHR" class="fi" placeholder="Contoh: Bapak Budi Santoso (HRD Manager)">
-                        <input id="targetPos" class="fi" placeholder="Contoh: Staff IT Support">
-                    </div>
-                </div>
-
-                <!-- Accordion Sections -->
-                
-                <!-- 1. Data Diri -->
-                <div>
-                    <div class="acc-hd" onclick="toggleAcc(this)">
-                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-user w-5"></i> Data Diri</span>
-                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
-                    </div>
-                    <div class="acc-bd open space-y-4">
-                        <div>
-                            <label class="fl">Nama Lengkap <span class="req">*</span></label>
-                            <input id="nama" class="fi" value="Muhammad Hafis" oninput="updatePreview()">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="fl">Email</label>
-                                <input id="email" class="fi" type="email" value="hafis@email.com" oninput="updatePreview()">
-                            </div>
-                            <div>
-                                <label class="fl">No. Telepon</label>
-                                <input id="phone" class="fi" value="0856-1234-5678" oninput="updatePreview()">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="fl">Domisili / Kota</label>
-                            <input id="lokasi" class="fi" value="Pekalongan, Jawa Tengah" oninput="updatePreview()">
-                        </div>
-                        <div>
-                            <label class="fl">Portfolio / Link (Opsional)</label>
-                            <input id="portfolio" class="fi" placeholder="Link LinkedIn atau Website" oninput="updatePreview()">
+                <div class="space-y-4" id="accordionContainer">
+                    
+                    <!-- Section: Target (Selalu Buka) -->
+                    <div class="acc-item active">
+                        <div class="p-4 bg-blue-50/50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-800/30 rounded-xl mb-4">
+                            <label class="fl text-blue-800 dark:text-blue-300">Target Lamaran</label>
+                            <input id="targetHR" class="fi mb-3" placeholder="Hrd Manager / Nama HR" oninput="updatePreview()">
+                            <input id="targetPos" class="fi" placeholder="Posisi yang dilamar" oninput="updatePreview()">
                         </div>
                     </div>
-                </div>
 
-                <!-- 2. Summary (Introduksi) -->
-                <div>
-                    <div class="acc-hd" onclick="toggleAcc(this)">
-                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-align-left w-5"></i> Ringkasan Diri</span>
-                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
-                    </div>
-                    <div class="acc-bd open">
-                        <p class="text-xs text-[var(--muted)] mb-2">Paragraf pembuka yang menjelaskan siapa Anda dan mengapa Anda tertarik dengan posisi ini.</p>
-                        <textarea id="summary" class="fi" rows="4" oninput="updatePreview()">Lulusan SMK Teknik Jaringan Komputer yang antusias dan memiliki ketertarikan kuat pada dunia IT Support. Terbiasa melakukan troubleshooting hardware dan software, serta konfigurasi jaringan dasar. Saya adalah pribadi yang cepat belajar, teliti, dan siap memberikan kontribusi nyata untuk tim IT.</textarea>
-                    </div>
-                </div>
-
-                <!-- 3. Pengalaman -->
-                <div>
-                    <div class="acc-hd" onclick="toggleAcc(this)">
-                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-briefcase w-5"></i> Pengalaman Utama</span>
-                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
-                    </div>
-                    <div class="acc-bd open">
-                        <div class="space-y-3">
-                            <div>
-                                <label class="fl">Jabatan Terakhir</label>
-                                <input id="expTitle" class="fi" value="IT Support Intern" oninput="updatePreview()">
-                            </div>
-                            <div>
-                                <label class="fl">Nama Perusahaan</label>
-                                <input id="expComp" class="fi" value="PT. Teknologi Nusantara" oninput="updatePreview()">
-                            </div>
-                            <div>
-                                <label class="fl">Pencapaian Utama (Poin)</label>
-                                <textarea id="expDesc" class="fi" rows="3" oninput="updatePreview()">• Melakukan maintenance rutin pada 50+ perangkat kantor.<br>• Membantu user dalam instalasi software dan troubleshooting jaringan LAN.<br>• Mendokumentasikan laporan bulanan untuk divisi IT.</textarea>
+                    <!-- Section: Data Diri -->
+                    <div class="acc-item active">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <span class="acc-title"><i class="fa-solid fa-user w-5 text-blue-500"></i> Data Diri</span>
+                            <i class="fa-solid fa-chevron-down ic"></i>
+                        </div>
+                        <div class="acc-bd">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="fl">Nama Lengkap <span class="req">*</span></label>
+                                    <input id="nama" class="fi" value="Muhammad Hafis" oninput="updatePreview()">
+                                </div>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="fl">Email</label>
+                                        <input id="email" class="fi" type="email" value="hafis@email.com" oninput="updatePreview()">
+                                    </div>
+                                    <div>
+                                        <label class="fl">Telepon</label>
+                                        <input id="phone" class="fi" value="0856-1234-5678" oninput="updatePreview()">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="fl">Domisili / Kota</label>
+                                    <input id="lokasi" class="fi" value="Pekalongan, Jawa Tengah" oninput="updatePreview()">
+                                </div>
+                                <div>
+                                    <label class="fl">Portfolio / Link (Opsional)</label>
+                                    <input id="portfolio" class="fi" placeholder="https://linkedin.com/in/..." oninput="updatePreview()">
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 4. Pendidikan -->
-                <div>
-                    <div class="acc-hd" onclick="toggleAcc(this)">
-                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-graduation-cap w-5"></i> Pendidikan Terakhir</span>
-                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
+                    <!-- Section: Introduksi -->
+                    <div class="acc-item">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <span class="acc-title"><i class="fa-solid fa-align-left w-5 text-purple-500"></i> Ringkasan Diri</span>
+                            <i class="fa-solid fa-chevron-down ic"></i>
+                        </div>
+                        <div class="acc-bd">
+                            <p class="text-xs text-[var(--muted)] mb-2">Hook atau paragraf pembuka.</p>
+                            <textarea id="summary" class="fi" rows="4" oninput="updatePreview()">Lulusan SMK Teknik Jaringan Komputer yang antusias dan memiliki ketertarikan kuat pada dunia IT Support. Terbiasa melakukan troubleshooting hardware dan software, serta konfigurasi jaringan dasar. Saya adalah pribadi yang cepat belajar, teliti, dan siap memberikan kontribusi nyata untuk tim IT.</textarea>
+                        </div>
                     </div>
-                    <div class="acc-bd open">
-                        <div class="space-y-3">
-                            <div>
-                                <label class="fl">Nama Sekolah / Universitas</label>
-                                <input id="eduName" class="fi" value="SMK Nurul Ummah Paninggaran" oninput="updatePreview()">
-                            </div>
-                            <div>
-                                <label class="fl">Jurusan</label>
-                                <input id="eduMajor" class="fi" value="Teknik Jaringan Komputer dan Telekomunikasi" oninput="updatePreview()">
-                            </div>
-                            <div>
-                                <label class="fl">Tahun Lulus / Periode</label>
-                                <input id="eduYear" class="fi" value="Lulus tahun 2024" oninput="updatePreview()">
+
+                    <!-- Section: Pengalaman -->
+                    <div class="acc-item">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <span class="acc-title"><i class="fa-solid fa-briefcase w-5 text-green-500"></i> Pengalaman Utama</span>
+                            <i class="fa-solid fa-chevron-down ic"></i>
+                        </div>
+                        <div class="acc-bd">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="fl">Jabatan Terakhir</label>
+                                    <input id="expTitle" class="fi" value="IT Support Intern" oninput="updatePreview()">
+                                </div>
+                                <div>
+                                    <label class="fl">Nama Perusahaan</label>
+                                    <input id="expComp" class="fi" value="PT. Teknologi Nusantara" oninput="updatePreview()">
+                                </div>
+                                <div>
+                                    <label class="fl">Pencapaian Utama (Poin)</label>
+                                    <p class="text-[10px] text-[var(--muted)] mb-1">*Gunakan Enter untuk pemisah poin</p>
+                                    <textarea id="expDesc" class="fi" rows="3" oninput="updatePreview()">Melakukan maintenance rutin pada 50+ perangkat kantor.
+Membantu user dalam instalasi software dan troubleshooting jaringan LAN.
+Mendokumentasikan laporan bulanan untuk divisi IT.</textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 5. Keahlian -->
-                <div>
-                    <div class="acc-hd" onclick="toggleAcc(this)">
-                        <span class="font-semibold text-[var(--text)]"><i class="fa-solid fa-tools w-5"></i> Keahlian (Highlight)</span>
-                        <i class="fa-solid fa-chevron-down ic text-[var(--muted)]"></i>
+                    <!-- Section: Pendidikan -->
+                    <div class="acc-item">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <span class="acc-title"><i class="fa-solid fa-graduation-cap w-5 text-orange-500"></i> Pendidikan Terakhir</span>
+                            <i class="fa-solid fa-chevron-down ic"></i>
+                        </div>
+                        <div class="acc-bd">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="fl">Sekolah / Universitas</label>
+                                    <input id="eduName" class="fi" value="SMK Nurul Ummah Paninggaran" oninput="updatePreview()">
+                                </div>
+                                <div>
+                                    <label class="fl">Jurusan</label>
+                                    <input id="eduMajor" class="fi" value="Teknik Jaringan Komputer dan Telekomunikasi" oninput="updatePreview()">
+                                </div>
+                                <div>
+                                    <label class="fl">Tahun Lulus / Periode</label>
+                                    <input id="eduYear" class="fi" value="Lulus tahun 2024" oninput="updatePreview()">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="acc-bd open">
-                        <p class="text-xs text-[var(--muted)] mb-2">Keahlian yang relevan dengan posisi (pisahkan dengan koma).</p>
-                        <textarea id="skills" class="fi" rows="2" oninput="updatePreview()">Microsoft Office, Troubleshooting Hardware, Instalasi Jaringan LAN/WAN, MikroTik Dasar, Linux Basic</textarea>
+
+                    <!-- Section: Keahlian -->
+                    <div class="acc-item">
+                        <div class="acc-hd" onclick="toggleAcc(this)">
+                            <span class="acc-title"><i class="fa-solid fa-tools w-5 text-red-500"></i> Keahlian (Highlight)</span>
+                            <i class="fa-solid fa-chevron-down ic"></i>
+                        </div>
+                        <div class="acc-bd">
+                            <p class="text-xs text-[var(--muted)] mb-2">Pisahkan dengan koma.</p>
+                            <textarea id="skills" class="fi" rows="2" oninput="updatePreview()">Microsoft Office, Troubleshooting Hardware, Instalasi Jaringan LAN/WAN, MikroTik Dasar, Linux Basic</textarea>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- KANAN: PREVIEW & ACTION -->
-        <div class="preview-col flex flex-col h-full space-y-4">
-            <div class="glass-card rounded-2xl p-1 flex-grow flex flex-col">
-                <div class="p-4 border-b border-[var(--border)] flex justify-between items-center bg-[var(--bg-surface)] rounded-t-xl">
-                    <span class="font-bold text-[var(--text)]"><i class="fa-solid fa-eye mr-2"></i>Pratinjau Surat</span>
-                    <div class="flex gap-2">
-                        <button onclick="clearData()" class="text-xs text-red-500 hover:text-red-600 font-semibold px-2 py-1">Reset</button>
+        <!-- KANAN: PREVIEW (Occupies 7 columns) -->
+        <div class="preview-col lg:col-span-7 flex flex-col h-full space-y-4">
+            <div class="glass-card rounded-2xl flex-grow flex flex-col min-h-[600px]">
+                <!-- Preview Header -->
+                <div class="p-4 border-b border-[var(--border)] flex justify-between items-center bg-[var(--bg-surface)] rounded-t-2xl">
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-[var(--text)]">Pratinjau Surat</span>
+                        <span id="mode-badge" class="text-[10px] bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 px-2 py-0.5 rounded font-bold border border-green-200 dark:border-green-800 hidden">
+                            Manual Mode
+                        </span>
                     </div>
+                    <button onclick="resetPreview()" class="text-xs text-blue-600 hover:text-blue-700 font-semibold px-2 py-1 transition">
+                        <i class="fa-solid fa-rotate-right mr-1"></i> Reset Manual Edit
+                    </button>
                 </div>
-                <div class="p-4 flex-grow relative">
-                    <!-- Badge Copy -->
-                    <div class="absolute top-2 right-2 z-10">
-                        <span class="text-[10px] bg-green-100 text-green-700 px-2 py-1 rounded font-bold border border-green-200 shadow-sm">Auto-Update</span>
+                
+                <!-- Preview Content -->
+                <div class="preview-wrapper m-4 border-0 shadow-inner">
+                    <div id="letterPreview" contenteditable="true" spellcheck="false" 
+                         oninput="handleManualEdit()" onfocus="handleManualEdit()">
+                        <!-- Letter Content Generated Here -->
                     </div>
-                    <div id="letterPreview" class="preview-box" contenteditable="true" spellcheck="false"></div>
                 </div>
             </div>
 
-            <!-- Action Button Fixed Bottom -->
-            <div class="glass-card p-4 rounded-2xl flex items-center justify-between">
-                <div class="text-sm text-[var(--muted)]">
-                    <i class="fa-solid fa-circle-info mr-1"></i> Pastek langsung ke email Anda.
+            <!-- Action Footer -->
+            <div class="glass-card p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-sm text-[var(--muted)] flex items-center">
+                    <i class="fa-solid fa-circle-info mr-2"></i> 
+                    <span>Anda bisa mengedit langsung di kotak pratinjau.</span>
                 </div>
-                <button onclick="copyEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-base transition shadow-lg shadow-blue-600/30 flex items-center gap-2 transform active:scale-95">
-                    <i class="fa-solid fa-paper-plane"></i> Salin ke Clipboard
+                <button onclick="copyEmail()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-xl font-bold text-base transition shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 transform active:scale-95">
+                    <i class="fa-regular fa-copy"></i> Salin ke Clipboard
                 </button>
             </div>
         </div>
 
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="toast">Berhasil disalin!</div>
+    <!-- TOAST ELEMENT -->
+    <div id="toast" class="toast">
+        <i class="fa-solid fa-check-circle"></i>
+        <span id="toast-msg">Berhasil disalin!</span>
+    </div>
 
     <script>
-        // --- DATA & STATE ---
-        // Kita menghapus flag isManualEdit agar tidak ada bug penghentian update
+        // --- STATE MANAGEMENT ---
+        let isManualMode = false;
 
-        function v(id) { return document.getElementById(id).value.trim(); }
-        function vRaw(id) { return document.getElementById(id).value; }
+        // Helper Functions
+        function getVal(id) { return document.getElementById(id).value.trim(); }
+        function getRaw(id) { return document.getElementById(id).value; }
 
-        // --- INTERAKSI ---
-        function toggleAcc(el) {
-            el.classList.toggle('text-blue-600');
-            const body = el.nextElementSibling;
-            const icon = el.querySelector('.ic');
+        // --- CORE LOGIC: LETTER GENERATOR ---
+        function updatePreview() {
+            // Jika user sedang mengedit manual di sebelah kanan, JANGAN update otomatis dari form kiri
+            if (isManualMode) return;
+
+            // 1. Ambil Data
+            const hrName = getVal('targetHR') || "Bapak/Ibu HRD yang Terhormat";
+            const myName = getVal('nama') || "Nama Lengkap";
+            const posisi = getVal('targetPos') || "Posisi yang Dilamar";
+            const lokasi = getVal('lokasi');
+            const email = getVal('email');
+            const phone = getVal('phone');
+            const portfolio = getVal('portfolio');
+            const summary = getVal('summary') || "...";
             
-            if (body.classList.contains('open')) {
-                body.classList.remove('open');
-                icon.style.transform = 'rotate(0deg)';
-            } else {
-                body.classList.add('open');
-                icon.style.transform = 'rotate(180deg)';
+            const expTitle = getVal('expTitle');
+            const expComp = getVal('expComp');
+            const expDesc = getVal('expDesc');
+            
+            const eduName = getVal('eduName');
+            const eduMajor = getVal('eduMajor');
+            const eduYear = getVal('eduYear');
+            
+            const skills = getVal('skills');
+
+            // 2. Format Data (Tanggal & Kontak)
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const tanggal = new Date().toLocaleDateString('id-ID', options);
+            const lokasiPrefix = lokasi ? `${lokasi}, ${tanggal}` : tanggal;
+            
+            let kontak = [];
+            if(email) kontak.push(email);
+            if(phone) kontak.push(phone);
+            const kontakStr = kontak.length > 0 ? kontak.join(" / ") : "";
+
+            // 3. Susun Paragraf
+            let letter = `Yth. ${hrName},\n\n`;
+            
+            letter += `Perkenalkan saya, ${myName} (${lokasiPrefix}). `;
+            letter += `Saya menulis email ini untuk menyatakan minat saya pada posisi ${posisi} di perusahaan Anda. `;
+            letter += `${summary}\n\n`;
+            
+            // Badan Surat (Pengalaman & Pendidikan)
+            let bodyContent = "";
+            
+            if (expTitle && expComp) {
+                bodyContent += `Saya memiliki pengalaman terakhir sebagai <strong>${expTitle}</strong> di ${expComp}. `;
+                // Convert newlines in textarea to sentences
+                const cleanDesc = expDesc.split('\n').map(line => {
+                    let clean = line.trim();
+                    // Hapus bullet point jika user mengetik manual di textarea
+                    if(clean.startsWith('•') || clean.startsWith('-')) clean = clean.substring(1).trim();
+                    return clean;
+                }).filter(line => line !== "").join(". ");
+                
+                if(cleanDesc) bodyContent += `Dalam peran ini, saya ${cleanDesc}. `;
+                bodyContent += `Pengalaman ini membentuk kemampuan teknis dan problem solving saya.\n`;
             }
+
+            if (eduName) {
+                bodyContent += `\nSecara akademis, saya lulus dari <strong>${eduName}</strong> jurusan ${eduMajor} (${eduYear}). `;
+                bodyContent += `Latar belakang ini memberikan saya pondasi teori yang kuat untuk mendukung praktik kerja di ${posisi}.\n`;
+            }
+            
+            if (skills) {
+                bodyContent += `\nSelain itu, saya menguasai beberapa keahlian pendukung seperti: ${skills}.`;
+            }
+
+            if(bodyContent) {
+                letter += bodyContent + "\n\n";
+            }
+
+            // Penutup
+            letter += `Saya sangat antusias untuk dapat berdiskusi lebih lanjut mengenai bagaimana saya dapat memberikan kontribusi terbaik bagi tim Anda. `;
+            if (portfolio) letter += `Anda juga dapat melihat portofolio saya di: ${portfolio}. `;
+            letter += `Terlampir CV saya untuk pertimbangan Anda.\n\n`;
+            
+            letter += `Terima kasih atas waktu dan perhatiannya.\n\n`;
+            letter += `Hormat saya,\n${myName}`;
+            if(kontakStr) letter += `\n${kontakStr}`;
+
+            // 4. Render ke DOM (Gunakan innerHTML untuk tag strong, tapi hati-hati XSS - disini input terbatas user sendiri)
+            const previewEl = document.getElementById('letterPreview');
+            previewEl.innerHTML = letter.replace(/\n/g, '<br>');
+        }
+
+        // --- INTERACTION LOGIC ---
+
+        // Handle User Typing in Preview Area
+        function handleManualEdit() {
+            if (!isManualMode) {
+                isManualMode = true;
+                const badge = document.getElementById('mode-badge');
+                badge.classList.remove('hidden');
+                
+                // Visual feedback on border
+                const wrapper = document.querySelector('.preview-wrapper');
+                wrapper.style.borderColor = 'var(--primary)';
+            }
+        }
+
+        // Reset Manual Mode (Kembalikan ke sinkronisasi dengan form)
+        function resetPreview() {
+            isManualMode = false;
+            document.getElementById('mode-badge').classList.add('hidden');
+            const wrapper = document.querySelector('.preview-wrapper');
+            wrapper.style.borderColor = 'var(--border)';
+            updatePreview(); // Trigger regen
+            showToast("Mode sinkronisasi diaktifkan kembali.");
+        }
+
+        function toggleAcc(el) {
+            const item = el.parentElement;
+            item.classList.toggle('active');
         }
 
         function toggleDark() {
             document.body.classList.toggle('dark-mode');
-            const btn = document.querySelector('.fa-moon');
+            const icon = document.getElementById('theme-icon');
             if (document.body.classList.contains('dark-mode')) {
-                btn.classList.remove('fa-moon');
-                btn.classList.add('fa-sun');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
             } else {
-                btn.classList.remove('fa-sun');
-                btn.classList.add('fa-moon');
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
             }
         }
 
         function clearData() {
-            if(confirm("Kosongkan semua formulir?")) {
+            if(confirm("Yakin ingin menghapus semua data formulir?")) {
                 document.querySelectorAll('input, textarea').forEach(el => el.value = '');
+                isManualMode = false; // Reset manual mode agar preview bersih
                 updatePreview();
             }
         }
 
-        // --- CORE LOGIC: GENERATE LETTER ---
-        function updatePreview() {
-            // Fungsi ini dipanggil OTOMATIS setiap ada input dari user.
-            // Tidak ada blokir if(manualEdit) sehingga preview selalu sinkron.
-
-            const hrName = v('targetHR') || "Bapak/Ibu HRD yang Terhormat";
-            const myName = v('nama') || "Nama Lengkap";
-            const posisi = v('targetPos') || "Posisi yang dilamar";
-            const lokasi = v('lokasi');
-            const kontak = (v('email') ? v('email') : "") + (v('phone') ? " / " + v('phone') : "");
-            const portfolio = v('portfolio');
-            const summary = v('summary') || "Saya adalah orang profesional yang berdedikasi.";
-            
-            // Data Pengalaman & Pendidikan
-            const expTitle = v('expTitle') || "";
-            const expComp = v('expComp') || "";
-            const expDesc = v('expDesc') || "";
-            
-            const eduName = v('eduName') || "";
-            const eduMajor = v('eduMajor') || "";
-            const eduYear = v('eduYear') || "";
-            
-            const skills = v('skills') || "";
-
-            // Format Tanggal Hari Ini
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const tanggal = new Date().toLocaleDateString('id-ID', options);
-            const tempat = lokasi ? `, ${lokasi}` : "";
-
-            // SUSUNAN SURAT
-            let letter = "";
-
-            // 1. Kepala
-            letter += `${hrName},\n\n`;
-            
-            // 2. Pembukaan (Hook)
-            letter += `Perkenalkan saya, ${myName}${tempat}. `;
-            letter += `Saya menulis surat ini untuk menyatakan ketertarikan saya pada posisi ${posisi} di perusahaan Anda. `;
-            letter += `${summary}\n\n`;
-            
-            // 3. Badan (Pengalaman & Pendidikan)
-            if (expTitle || eduName) {
-                letter += `Selama perjalanan karir dan pendidikan saya, saya telah mengembangkan kompetensi yang relevan untuk peran ini:\n\n`;
-                
-                // Pengalaman
-                if (expTitle && expComp) {
-                    letter += `• Terakhir bekerja sebagai <strong>${expTitle}</strong> di ${expComp}, `;
-                    // Bersihkan teks agar tidak ada <br> HTML saat kirim email
-                    const cleanDesc = expDesc.replace(/<br>/g, ' ').replace(/•/g, '').replace(/\n/g, ' ');
-                    letter += `dimana saya berhasil ${cleanDesc}. `;
-                    letter += `Pengalaman ini mengajarkan saya ketelitian dan kemampuan pemecahan masalah dalam lingkungan kerja nyata.\n`;
-                }
-
-                // Pendidikan
-                if (eduName) {
-                    letter += `• Lulusan dari <strong>${eduName}</strong> jurusan ${eduMajor} (${eduYear}). `;
-                    letter += `Latar belakang akademis ini memberikan saya fondasi teknis yang kuat untuk mendukung tugas-tugas di ${posisi}.\n`;
-                }
-                
-                // Skills
-                if (skills) {
-                    const cleanSkills = skills.replace(/\n/g, ', ');
-                    letter += `• Selain itu, saya menguasai beberapa keterampilan pendukung seperti: <strong>${cleanSkills}</strong>.\n`;
-                }
-                
-                letter += `\n`;
-            }
-
-            // 4. Penutup
-            letter += `Saya sangat antusias untuk kesempatan berkontribusi bersama tim ${expComp ? expComp : 'Anda'}. `;
-            letter += `Saya yakin bahwa etos kerja dan semangat belajar saya akan menjadi nilai tambahan bagi perusahaan.\n\n`;
-            
-            letter += `Saya telah melampirkan CV dan portofolio saya untuk pertimbangan Anda. `;
-            if (portfolio) letter += `Anda juga dapat melihat profil lengkap saya di: ${portfolio}. `;
-            letter += `Saya sangat mengharapkan kesempatan untuk wawancara dan mendiskusikan lebih lanjut bagaimana saya dapat memberikan kontribusi terbaik.\n\n`;
-            
-            letter += `Terima kasih atas waktu dan pertimbangan Anda.\n\n`;
-            letter += `Hormat saya,\n${myName}`;
-            if (kontak) letter += `\n${kontak}`;
-
-            // Set ke Textarea
-            const previewEl = document.getElementById('letterPreview');
-            previewEl.textContent = letter;
-        }
-
         function copyEmail() {
-            const text = document.getElementById('letterPreview').textContent;
+            // Kita gunakan innerText untuk mengambil plain text tanpa tag HTML <br>
+            const text = document.getElementById('letterPreview').innerText;
             if(!text.trim()) return;
+            
             navigator.clipboard.writeText(text).then(() => {
-                showToast("Surat email berhasil disalin! Silakan paste di Gmail.");
+                showToast("Email berhasil disalin! Siap dipaste di Gmail.");
             }).catch(err => {
-                showToast("Gagal menyalin teks.");
                 console.error(err);
+                showToast("Gagal menyalin teks.");
             });
         }
 
-        function showToast(msg) {
+        function showToast(message) {
             const toast = document.getElementById('toast');
-            toast.textContent = msg;
+            const msgEl = document.getElementById('toast-msg');
+            msgEl.textContent = message;
+            
             toast.classList.add('show');
             setTimeout(() => {
                 toast.classList.remove('show');
             }, 3000);
         }
 
-        // Init
+        // Initialize
         window.onload = function() {
             updatePreview();
         };
+
+        // Shortcuts (Optional UX)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                copyEmail();
+            }
+        });
+
     </script>
 </body>
 </html>
